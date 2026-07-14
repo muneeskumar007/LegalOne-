@@ -11,6 +11,7 @@ const NAV = [
   { to:'/validate',  icon:CheckCircle,   label:'Validate'    },
   { to:'/compare',   icon:GitCompare,    label:'Compare'     },
   { to:'/reference', icon:BookOpen,      label:'Bare Acts'   },
+  { to:'/my-cases',  icon:null,          label:'My Cases', iconUrl:'https://img.icons8.com/fluency-systems-filled/48/d4a843/briefcase.png' },
 ]
 
 function UserMenu({ advocate, logout }) {
@@ -77,11 +78,11 @@ export default function Layout({ children }) {
 
       <nav style={{ padding: '10px 10px', flex: 1, overflowY: 'auto' }}>
         <div style={{ fontSize: 10, color: 'var(--text-muted)', letterSpacing: '0.1em', textTransform: 'uppercase', padding: '0 4px 6px', marginBottom: 4 }}>Navigation</div>
-        {NAV.map(({ to, icon: Icon, label }) => (
+        {NAV.map(({ to, icon: Icon, label, iconUrl }) => (
           <NavLink key={to} to={to} end={to==='/'} onClick={() => setOpen(false)}
             className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
             style={{ marginBottom: 2 }}>
-            <Icon size={14} /><span>{label}</span>
+            {iconUrl ? <img src={iconUrl} alt="" width="14" height="14" style={{ opacity: 0.9 }} /> : <Icon size={14} />}<span>{label}</span>
           </NavLink>
         ))}
       </nav>
