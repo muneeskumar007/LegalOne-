@@ -1,0 +1,23 @@
+[33mbe788ca[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmycases[m[33m)[m HEAD@{0}: pull origin main: Fast-forward
+[33m18a55e3[m HEAD@{1}: checkout: moving from mycases to main
+[33mbe788ca[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmycases[m[33m)[m HEAD@{2}: pull origin main: Fast-forward
+[33m060f367[m[33m ([m[1;31morigin/mycases[m[33m)[m HEAD@{3}: checkout: moving from Yamuna to mycases
+[33m1e8e21d[m[33m ([m[1;32myathish[m[33m, [m[1;32myamuna[m[33m)[m HEAD@{4}: checkout: moving from mycases to Yamuna
+[33m060f367[m[33m ([m[1;31morigin/mycases[m[33m)[m HEAD@{5}: commit: mmmo
+[33mb48373d[m HEAD@{6}: checkout: moving from yathish to mycases
+[33m1e8e21d[m[33m ([m[1;32myathish[m[33m, [m[1;32myamuna[m[33m)[m HEAD@{7}: pull origin main: Fast-forward
+[33md4e459b[m HEAD@{8}: checkout: moving from main to yathish
+[33m18a55e3[m HEAD@{9}: checkout: moving from yamuna to main
+[33m1e8e21d[m[33m ([m[1;32myathish[m[33m, [m[1;32myamuna[m[33m)[m HEAD@{10}: pull origin main: Fast-forward
+[33md79d95b[m[33m ([m[1;31morigin/yamuna[m[33m)[m HEAD@{11}: commit: mmmo
+[33mdf7d729[m HEAD@{12}: pull origin main: Fast-forward
+[33m5aed2a9[m HEAD@{13}: checkout: moving from mycases to yamuna
+[33mb48373d[m HEAD@{14}: checkout: moving from main to mycases
+[33m18a55e3[m HEAD@{15}: commit: demo
+[33m79e5993[m HEAD@{16}: commit: colour change
+[33mb5628b5[m HEAD@{17}: commit (merge): resolve conflict
+[33m46f365b[m HEAD@{18}: commit: resolve conflict
+[33meac664a[m HEAD@{19}: checkout: moving from yathish to main
+[33md4e459b[m HEAD@{20}: checkout: moving from main to yathish
+[33meac664a[m HEAD@{21}: Branch: renamed refs/heads/master to refs/heads/main
+[33meac664a[m HEAD@{23}: commit (initial): first commit

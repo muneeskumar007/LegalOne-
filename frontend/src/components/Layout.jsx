@@ -4,12 +4,14 @@ import { Scale, FileText, FolderOpen, LayoutTemplate, BookOpen, Gavel, Settings,
 import { useAuth } from '../context/AuthContext'
 
 const NAV = [
-  { to:'/draft',      icon: FileText,       label:'AI DRAFTER'   },
-  { to:'/',            icon: FolderOpen,     label:'MY CASES'     },
-  { to:'/reference',   icon: LayoutTemplate, label:'TEMPLATES'    },
-  { to:'/compare',     icon: BookOpen,       label:'BARE ACTS'    },
-  { to:'/judgements',  icon: Gavel,          label:'JUDGEMENTS'   },
-  { to:'/profile',     icon: Settings,       label:'SETTINGS'     },
+  { to:'/',          icon:Scale,         label:'Dashboard'   },
+  { to:'/pipeline',  icon:GitBranch,     label:'AI Pipeline' },
+  { to:'/draft',     icon:FileText,      label:'Draft'       },
+  { to:'/arguments', icon:MessageSquare, label:'Arguments'   },
+  { to:'/validate',  icon:CheckCircle,   label:'Validate'    },
+  { to:'/compare',   icon:GitCompare,    label:'Compare'     },
+  { to:'/reference', icon:BookOpen,      label:'Bare Acts'   },
+  { to:'/my-cases',  icon:null,          label:'My Cases', iconUrl:'https://img.icons8.com/fluency-systems-filled/48/d4a843/briefcase.png' },
 ]
 
 /* ── Balance / Scales SVG Logo ── */
@@ -146,17 +148,15 @@ export default function Layout({ children }) {
         </div>
       </div>
 
-      {/* ── Navigation ── */}
-      <nav style={{ padding: '0 14px', flex: 1, overflowY: 'auto' }}>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-          {NAV.map(({ to, icon: Icon, label }) => (
-            <NavLink key={to + label} to={to} end={to==='/'} onClick={() => setOpen(false)}
-              className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
-              style={{ marginBottom: 0 }}>
-              <Icon size={18} strokeWidth={1.5} /><span style={{ letterSpacing: '0.06em', fontSize: 13 }}>{label}</span>
-            </NavLink>
-          ))}
-        </div>
+      <nav style={{ padding: '10px 10px', flex: 1, overflowY: 'auto' }}>
+        <div style={{ fontSize: 10, color: 'var(--text-muted)', letterSpacing: '0.1em', textTransform: 'uppercase', padding: '0 4px 6px', marginBottom: 4 }}>Navigation</div>
+        {NAV.map(({ to, icon: Icon, label, iconUrl }) => (
+          <NavLink key={to} to={to} end={to==='/'} onClick={() => setOpen(false)}
+            className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
+            style={{ marginBottom: 2 }}>
+            {iconUrl ? <img src={iconUrl} alt="" width="14" height="14" style={{ opacity: 0.9 }} /> : <Icon size={14} />}<span>{label}</span>
+          </NavLink>
+        ))}
       </nav>
 
       {/* ── Bottom Section ── */}
