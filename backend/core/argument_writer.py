@@ -7,7 +7,7 @@ citing relevant precedents and statutory provisions retrieved via RAG.
 import json
 import requests
 from typing import Dict, Any, List, Optional
-from core.rag_pipeline import retrieve
+from  core.integration_rag_pipeline import retrieve
 
 OLLAMA_BASE_URL = "http://localhost:11434"
 OLLAMA_MODEL    = "llama3"

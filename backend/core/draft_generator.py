@@ -6,7 +6,7 @@ Falls back to rule-based template generation if Ollama is unavailable.
 import json
 import requests
 from typing import Dict, Any, Optional
-from core.rag_pipeline import get_context_for_prompt
+from  core.integration_rag_pipeline import get_context_for_prompt
 
 OLLAMA_BASE_URL = "http://localhost:11434"
 OLLAMA_MODEL = "llama3"
