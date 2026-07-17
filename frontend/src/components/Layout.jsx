@@ -11,6 +11,8 @@ const NAV = [
   { to:'/validate',  icon:CheckCircle,   label:'Validate'    },
   { to:'/compare',   icon:GitCompare,    label:'Compare'     },
   { to:'/reference', icon:BookOpen,      label:'Bare Acts'   },
+
+  { to:'/rag', icon:Database, label:'RAG Status' }
 ]
 
 function UserMenu({ advocate, logout }) {

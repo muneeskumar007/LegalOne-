@@ -1,8 +1,18 @@
+"""
+Updated main.py for legalone/backend/main.py
+Adds the rag_status router to the existing routes.
+Replace your existing main.py with this file.
+"""
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+
+# Existing routers
 from routers import extract, classify, draft, validate, compare, arguments, export
 from routers import auth_router, history
-import uvicorn
+
+# NEW — RAG status router
+from routers.rag_status import router as rag_status_router
 
 app = FastAPI(
     title="LegalOne AI Drafting System",
@@ -12,13 +22,17 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://localhost:5173", "http://localhost:4173"],
+    allow_origins=[
+        "http://localhost:3000",
+        "http://localhost:5173",
+        "http://localhost:4173"
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Public routes (no auth needed)
+# Public routes
 app.include_router(extract.router,       prefix="/api", tags=["Extraction"])
 app.include_router(classify.router,      prefix="/api", tags=["Classification"])
 app.include_router(draft.router,         prefix="/api", tags=["Draft Generation"])
@@ -30,16 +44,39 @@ app.include_router(export.router,        prefix="/api", tags=["Export"])
 # Auth routes
 app.include_router(auth_router.router,   prefix="/api", tags=["Authentication"])
 
-# History routes (requires JWT)
+# History routes
 app.include_router(history.router,       prefix="/api", tags=["Case History"])
+
+# NEW — RAG status routes
+app.include_router(rag_status_router,    prefix="/api", tags=["RAG Status"])
+
 
 @app.get("/")
 def root():
-    return {"message": "LegalOne AI Backend v3.0", "status": "ok", "docs": "/docs"}
+    return {
+        "message": "LegalOne AI Backend v3.0",
+        "status":  "ok",
+        "docs":    "/docs"
+    }
+
 
 @app.get("/health")
 def health():
-    return {"status": "healthy", "version": "3.0.0"}
+    # Also return RAG status in health check
+    try:
+        from core.rag_pipeline import get_index_info
+        rag_info = get_index_info()
+    except Exception:
+        rag_info = {"active_index": "unknown"}
+
+    return {
+        "status":      "healthy",
+        "version":     "3.0.0",
+        "rag_index":   rag_info.get("active_index", "unknown"),
+        "rag_size":    rag_info.get("active_size", 0),
+    }
+
 
 if __name__ == "__main__":
+    import uvicorn
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
