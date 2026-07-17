@@ -30,6 +30,7 @@ export default function App() {
             <Route path="/validate"  element={<ValidatePage />} />
             <Route path="/compare"   element={<ComparePage />}  />
             <Route path="/reference" element={<ReferencePage />}/>
+            <Route path="/my-cases"  element={<JudgementsDashboard />}     />
             <Route path="/profile"   element={<ProfilePage />}  />
           </Routes>
         </Layout>
