@@ -1,13 +1,15 @@
+import { useState } from 'react'
 import { Scale, FileText, GitBranch, CheckCircle, GitCompare, ArrowRight, Gavel, MessageSquare, BookOpen } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
+import DraftPage from './DraftPage'
 
 const CARDS = [
-  { to:'/pipeline',  icon:GitBranch,     title:'AI Pipeline',      desc:'Full extract → classify → RAG → draft → validate in one click',       badge:'Recommended',  cls:'badge-gold'    },
-  { to:'/draft',     icon:FileText,      title:'Quick Draft',       desc:'Get an AI petition in seconds with PDF export',                        badge:'AI + PDF',     cls:'badge-info'    },
-  { to:'/arguments', icon:MessageSquare, title:'Argument Writer',   desc:'Generate petitioner & respondent arguments with SC precedents',        badge:'Precedents',   cls:'badge-warning' },
-  { to:'/validate',  icon:CheckCircle,   title:'Validate',          desc:'Check any draft for missing sections and legal compliance',            badge:'Quality Check',cls:'badge-success' },
-  { to:'/compare',   icon:GitCompare,    title:'Compare Docs',      desc:'Detect factual contradictions between petition and counter',           badge:'Contradiction',cls:'badge-error'   },
-  { to:'/reference', icon:BookOpen,      title:'Bare Acts',         desc:'Quick-search 10 Indian Acts and 35+ key sections',                    badge:'Reference',    cls:'badge-gold'    },
+  { id: 'draft',     to:'/draft',     icon:FileText,      title:'AI Drafter',        desc:'Describe your case and let AI create a complete legal draft in seconds.',        badge:'AI + PDF',     cls:'badge-info'    },
+  { id: null,        to:'/pipeline',  icon:GitBranch,     title:'AI Pipeline',       desc:'Full extract → classify → RAG → draft → validate in one click',                  badge:'Recommended',  cls:'badge-gold'    },
+  { id: null,        to:'/arguments', icon:MessageSquare, title:'Argument Writer',   desc:'Generate petitioner & respondent arguments with SC precedents',                   badge:'Precedents',   cls:'badge-warning' },
+  { id: null,        to:'/validate',  icon:CheckCircle,   title:'Validate',          desc:'Check any draft for missing sections and legal compliance',                       badge:'Quality Check',cls:'badge-success' },
+  { id: null,        to:'/compare',   icon:GitCompare,    title:'Compare Docs',      desc:'Detect factual contradictions between petition and counter',                      badge:'Contradiction',cls:'badge-error'   },
+  { id: null,        to:'/reference', icon:BookOpen,      title:'Bare Acts',         desc:'Quick-search 10 Indian Acts and 35+ key sections',                               badge:'Reference',    cls:'badge-gold'    },
 ]
 
 const PIPELINE = ['User Input','Fact Extraction','Classification','Rule Engine','RAG Retrieval','LLM Draft','Validation','Advocate Review','Output']
@@ -24,7 +26,29 @@ const TECH = [
 
 export default function Dashboard() {
   const navigate = useNavigate()
+  const [activeModule, setActiveModule] = useState(null)
 
+  /* ── If a module is active, render it in place of the dashboard ── */
+  if (activeModule === 'draft') {
+    return (
+      <div style={{ margin: '-36px -32px -40px', minHeight: '100vh' }}>
+        {/* Back button strip */}
+        <div style={{ padding: '10px 20px', background: 'var(--bg-secondary)', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center' }}>
+          <button
+            onClick={() => setActiveModule(null)}
+            style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'none', border: 'none', color: 'var(--text-muted)', fontSize: 12, cursor: 'pointer', padding: '4px 8px', borderRadius: 6 }}
+            onMouseEnter={e => e.currentTarget.style.color = 'var(--text-primary)'}
+            onMouseLeave={e => e.currentTarget.style.color = 'var(--text-muted)'}
+          >
+            ← Back to Dashboard
+          </button>
+        </div>
+        <DraftPage />
+      </div>
+    )
+  }
+
+  /* ── Default: Dashboard home ─────────────────────────────────────── */
   return (
     <div style={{ maxWidth: 920 }}>
       {/* Hero */}
@@ -54,33 +78,19 @@ export default function Dashboard() {
         </p>
       </div>
 
-      {/* Pipeline strip */}
-      {/* <div className="glass-card animate-fade-up delay-100" style={{ padding: '18px 22px', marginBottom: 28 }}>
-        <div style={{ fontSize: 10, color: 'var(--text-muted)', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 12 }}>
-          AI Pipeline Architecture
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 4 }}>
-          {PIPELINE.map((step, i) => (
-            <div key={step} style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-              <div style={{
-                padding: '4px 9px', borderRadius: 5, fontSize: 11, fontWeight: 500,
-                background: i === 0 ? 'rgba(212,168,67,0.15)' : 'var(--bg-card)',
-                color: i === 0 ? 'var(--gold)' : 'var(--text-secondary)',
-                border: `1px solid ${i === 0 ? 'rgba(212,168,67,0.3)' : 'var(--border)'}`,
-              }}>{step}</div>
-              {i < PIPELINE.length - 1 && <ArrowRight size={10} color="var(--text-muted)" />}
-            </div>
-          ))}
-        </div>
-      </div> */}
-
       {/* Feature cards */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(188px, 1fr))', gap: 14 }}>
-        {CARDS.map(({ to, icon: Icon, title, desc, badge, cls }, i) => (
+        {CARDS.map(({ id, to, icon: Icon, title, desc, badge, cls }, i) => (
           <div
             key={to}
             className={`glass-card animate-fade-up delay-${Math.min((i+1)*100,300)}`}
-            onClick={() => navigate(to)}
+            onClick={() => {
+              if (id === 'draft') {
+                setActiveModule('draft')
+              } else {
+                navigate(to)
+              }
+            }}
             style={{ padding: '18px 16px', cursor: 'pointer', transition: 'border-color 0.2s, transform 0.2s, box-shadow 0.2s' }}
             onMouseEnter={e => { e.currentTarget.style.borderColor='var(--border-light)'; e.currentTarget.style.transform='translateY(-2px)'; e.currentTarget.style.boxShadow='0 8px 28px rgba(0,0,0,0.3)' }}
             onMouseLeave={e => { e.currentTarget.style.borderColor='var(--border)';       e.currentTarget.style.transform='translateY(0)';    e.currentTarget.style.boxShadow='none' }}
@@ -99,21 +109,6 @@ export default function Dashboard() {
           </div>
         ))}
       </div>
-
-      {/* Tech stack */}
-      {/* <div className="animate-fade-up" style={{ marginTop: 28, padding: '14px 18px', background: 'var(--bg-card)', borderRadius: 10, border: '1px solid var(--border)' }}>
-        <div style={{ fontSize: 10, color: 'var(--text-muted)', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 10 }}>
-          Tech Stack — 100% Free &amp; Open Source
-        </div>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 7 }}>
-          {TECH.map(([name, role]) => (
-            <div key={name} style={{ padding: '5px 11px', borderRadius: 6, background: 'var(--bg-secondary)', border: '1px solid var(--border)', fontSize: 12 }}>
-              <span style={{ color: 'var(--gold)', fontWeight: 600 }}>{name}</span>
-              <span style={{ color: 'var(--text-muted)', marginLeft: 6 }}>— {role}</span>
-            </div>
-          ))}
-        </div>
-      </div> */}
     </div>
   )
 }
