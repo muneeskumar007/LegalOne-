@@ -10,6 +10,7 @@ import ArgumentPage  from './pages/ArgumentPage'
 import LoginPage     from './pages/LoginPage'
 import SignupPage    from './pages/SignupPage'
 import ProfilePage   from './pages/ProfilePage'
+import Judgement     from './pages/Judgement'
 
 export default function App() {
   return (
@@ -30,6 +31,7 @@ export default function App() {
             <Route path="/compare"   element={<ComparePage />}  />
             <Route path="/reference" element={<ReferencePage />}/>
             <Route path="/profile"   element={<ProfilePage />}  />
+            <Route path="/judgements" element={<Judgement />}    />
           </Routes>
         </Layout>
       } />
