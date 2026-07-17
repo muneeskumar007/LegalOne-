@@ -10,7 +10,7 @@ import ArgumentPage  from './pages/ArgumentPage'
 import LoginPage     from './pages/LoginPage'
 import SignupPage    from './pages/SignupPage'
 import ProfilePage   from './pages/ProfilePage'
-import JudgementsDashboard from './pages/JudgementsDashboard'
+import Judgement     from './pages/Judgement'
 
 export default function App() {
   return (
