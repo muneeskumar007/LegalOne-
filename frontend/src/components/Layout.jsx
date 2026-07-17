@@ -4,15 +4,14 @@ import { Scale, FileText, GitBranch, CheckCircle, GitCompare, Menu, X, Gavel, Bo
 import { useAuth } from '../context/AuthContext'
 
 const NAV = [
-  { to:'/',          icon:Scale,         label:'Dashboard'   },
-  { to:'/pipeline',  icon:GitBranch,     label:'AI Pipeline' },
-  { to:'/draft',     icon:FileText,      label:'Draft'       },
-  { to:'/arguments', icon:MessageSquare, label:'Arguments'   },
-  { to:'/validate',  icon:CheckCircle,   label:'Validate'    },
-  { to:'/compare',   icon:GitCompare,    label:'Compare'     },
-  { to:'/reference', icon:BookOpen,      label:'Bare Acts'   },
-
-  { to:'/rag', icon:Database, label:'RAG Status' }
+  { to:'/',           icon:Scale,         label:'Dashboard'   },
+  { to:'/pipeline',   icon:GitBranch,     label:'AI Pipeline' },
+  { to:'/draft',      icon:FileText,      label:'Draft'       },
+  { to:'/arguments',  icon:MessageSquare, label:'Arguments'   },
+  { to:'/validate',   icon:CheckCircle,   label:'Validate'    },
+  { to:'/compare',    icon:GitCompare,    label:'Compare'     },
+  { to:'/reference',  icon:BookOpen,      label:'Bare Acts'   },
+  { to:'/judgements', icon:Gavel,         label:'Judgements'  },
 ]
 
 function UserMenu({ advocate, logout }) {
