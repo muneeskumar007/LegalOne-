@@ -15,8 +15,24 @@ export default function App() {
   return (
     <Routes>
       <Route path="/login"  element={<LoginPage />}  />
-      <Route path="/signup" element={<SignupPage />} />
-      <Route path="/*" element={<Layout />} />
+      <Route path="/signup" element={<SignupPage />}  />
+
+      {/* App pages — with sidebar Layout */}
+      <Route path="/*" element={
+        <Layout>
+          <Routes>
+            <Route path="/"          element={<Dashboard />}    />
+            <Route path="/pipeline"  element={<PipelinePage />} />
+            <Route path="/draft"     element={<DraftPage />}    />
+            <Route path="/arguments" element={<ArgumentPage />} />
+            <Route path="/validate"  element={<ValidatePage />} />
+            <Route path="/compare"   element={<ComparePage />}  />
+            <Route path="/reference" element={<ReferencePage />}/>
+            <Route path="/my-cases"  element={<JudgementsDashboard />}     />
+            <Route path="/profile"   element={<ProfilePage />}  />
+          </Routes>
+        </Layout>
+      } />
     </Routes>
   )
 }
