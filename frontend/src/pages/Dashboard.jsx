@@ -1,7 +1,7 @@
-import { Scale, FileText, GitBranch, CheckCircle, GitCompare, ArrowRight, Gavel, MessageSquare, BookOpen } from 'lucide-react'
- 
-import { useState } from 'react'
+import { Scale, FileText, GitBranch, CheckCircle, GitCompare, ArrowRight, Gavel, MessageSquare, BookOpen, Plus, Search, FolderOpen } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
+import { useState } from 'react'
+
 
 const CARDS = [
   { id: 'draft',     to:'/draft',     icon:FileText,      title:'AI Drafter',        desc:'Describe your case and let AI create a complete legal draft in seconds.',        badge:'AI + PDF',     cls:'badge-info'    },
@@ -23,10 +23,13 @@ const TECH = [
   ['ReportLab','PDF Export'],
   ['RAG Pipeline','Retrieval']]
 
-
+ 
 
 export default function Dashboard({ onModuleSelect }) {
   const navigate = useNavigate()
+  const [search, setSearch] = useState('')
+  const filtered = CARDS.filter(card => card.title.toLowerCase().includes(search.toLowerCase()))
+
   return (
     <div style={{ maxWidth: 960 }}>
       {/* ── Header ── */}
@@ -74,7 +77,7 @@ export default function Dashboard({ onModuleSelect }) {
         gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))',
         gap: 16
       }}>
-        {filtered.map(({ to, icon: Icon, title, desc, badge }, i) => (
+        {filtered.map(({ id, to, icon: Icon, title, desc, badge }, i) => (
           <div
             key={to}
             className={`glass-card animate-fade-up delay-${Math.min((i+1)*100,300)}`}
