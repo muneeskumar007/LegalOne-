@@ -11,6 +11,22 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap');
 
 :root {
+  --bg-primary: #000000;
+  --bg-secondary: #050505;
+  --bg-card: #0a0a0a;
+  --bg-card-hover: #161616;
+  --border: #2a2a2a;
+  --border-light: #3a3a3a;
+  --text-primary: #ffffff;
+  --text-secondary: #e5e5e5;
+  --text-muted: #a3a3a3;
+  --gold: #ffffff;
+  --gold-dim: #d4d4d4;
+  --accent: #ffffff;
+  --success: #4ade80;
+  --warning: #fb923c;
+  --error: #f87171;
+  --info: #60a5fa;
   --bg-primary: #ffffff;
   --bg-secondary: #fafafa;
   --bg-card: #f5f5f5;
@@ -49,12 +65,11 @@ body {
 ::-webkit-scrollbar { width: 5px; height: 5px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--border-light); border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: #a3a3a3; }
-::selection { background: rgba(10,10,10,0.12); color: var(--text-primary); }
+::selection { background: rgba(255,255,255,0.25); color: var(--text-primary); }
 
 /* ── Typography Shimmer (now monochrome) ── */
 .gold-shimmer {
-  background: linear-gradient(90deg, #0a0a0a 0%, #525252 50%, #0a0a0a 100%);
+  background: linear-gradient(90deg, var(--gold) 0%, #a3a3a3 50%, var(--gold) 100%);
   background-size: 200% 100%;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -79,13 +94,14 @@ body {
   background: var(--accent);
   color: #ffffff;
   font-weight: 600;
-  letter-spacing: 0.01em;
-  transition: all 0.2s ease;
+  letter-spacing: 0.02em;
+  transition: all 0.25s ease;
+  box-shadow: 0 0 24px rgba(255,255,255,0.12);
   cursor: pointer;
   border: none;
   box-shadow: 0 1px 3px rgba(0,0,0,0.12);
 }
-.btn-gold:hover { background: var(--accent-light); box-shadow: 0 4px 12px rgba(0,0,0,0.15); transform: translateY(-1px); }
+.btn-gold:hover { box-shadow: 0 0 36px rgba(255,255,255,0.22); transform: translateY(-1px); }
 .btn-gold:active { transform: translateY(0); }
 .btn-gold:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; }
 
@@ -102,7 +118,7 @@ body {
   width: 100%;
   padding: 12px 16px;
 }
-.legal-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(10,10,10,0.06); }
+.legal-input:focus { border-color: var(--gold-dim); box-shadow: 0 0 0 3px rgba(255,255,255,0.12); }
 .legal-input::placeholder { color: var(--text-muted); }
 
 /* ── Code Output ── */
@@ -121,45 +137,23 @@ body {
 
 /* ── Badges ── */
 .badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 500; }
-.badge-success { background: rgba(34,197,94,0.08);  color: var(--success); border: 1px solid rgba(34,197,94,0.15); }
-.badge-warning { background: rgba(245,158,11,0.08); color: var(--warning); border: 1px solid rgba(245,158,11,0.15); }
-.badge-error   { background: rgba(239,68,68,0.08);  color: var(--error);   border: 1px solid rgba(239,68,68,0.15); }
-.badge-info    { background: rgba(59,130,246,0.08);  color: var(--info);    border: 1px solid rgba(59,130,246,0.15); }
-.badge-gold    { background: rgba(10,10,10,0.06);    color: var(--accent);  border: 1px solid rgba(10,10,10,0.1); }
+.badge-success { background: rgba(74,222,128,0.12); color: var(--success); border: 1px solid rgba(74,222,128,0.2); }
+.badge-warning { background: rgba(251,146,60,0.12); color: var(--warning); border: 1px solid rgba(251,146,60,0.2); }
+.badge-error   { background: rgba(248,113,113,0.12); color: var(--error);   border: 1px solid rgba(248,113,113,0.2); }
+.badge-info    { background: rgba(96,165,250,0.12);  color: var(--info);    border: 1px solid rgba(96,165,250,0.2); }
+.badge-gold    { background: rgba(255,255,255,0.12);  color: var(--gold);    border: 1px solid rgba(255,255,255,0.2); }
 
-/* ── Pipeline Steps ── */
-.pipeline-step { display: flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 10px; font-size: 13px; font-weight: 500; transition: all 0.3s ease; }
-.pipeline-step.active  { background: rgba(10,10,10,0.06); color: var(--accent); border: 1px solid rgba(10,10,10,0.12); }
-.pipeline-step.done    { background: rgba(34,197,94,0.06); color: var(--success); border: 1px solid rgba(34,197,94,0.15); }
+.pipeline-step { display: flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 8px; font-size: 13px; font-weight: 500; transition: all 0.3s ease; }
+.pipeline-step.active  { background: rgba(255,255,255,0.15); color: var(--gold);    border: 1px solid rgba(255,255,255,0.3); }
+.pipeline-step.done    { background: rgba(74,222,128,0.1);  color: var(--success); border: 1px solid rgba(74,222,128,0.2); }
 .pipeline-step.pending { background: var(--bg-card); color: var(--text-muted); border: 1px solid var(--border); }
 
 /* ── Skeleton Loader ── */
 .skeleton { background: linear-gradient(90deg, var(--bg-card) 0%, var(--bg-card-hover) 50%, var(--bg-card) 100%); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 8px; }
 
-/* ── Sidebar Nav Items ── */
-.nav-item {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  padding: 13px 18px;
-  border-radius: 12px;
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--text-secondary);
-  cursor: pointer;
-  transition: all 0.2s ease;
-  text-decoration: none;
-  letter-spacing: 0.02em;
-}
-.nav-item:hover {
-  background: var(--sidebar-hover-bg);
-  color: var(--text-primary);
-}
-.nav-item.active {
-  background: var(--sidebar-active-bg);
-  color: var(--sidebar-active-text);
-  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
-}
+.nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 8px; font-size: 14px; font-weight: 500; color: var(--text-secondary); cursor: pointer; transition: all 0.2s; text-decoration: none; }
+.nav-item:hover { background: var(--bg-card-hover); color: var(--text-primary); }
+.nav-item.active { background: rgba(255,255,255,0.12); color: var(--gold); border: 1px solid rgba(255,255,255,0.2); }
 
 /* ── Progress Bar ── */
 .progress-bar { height: 6px; border-radius: 3px; background: var(--border); overflow: hidden; }

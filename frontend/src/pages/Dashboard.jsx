@@ -1,3 +1,25 @@
+import { Scale, FileText, GitBranch, CheckCircle, GitCompare, ArrowRight, Gavel, MessageSquare, BookOpen } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
+
+const CARDS = [
+  { id: 'draft',     to:'/draft',     icon:FileText,      title:'AI Drafter',        desc:'Describe your case and let AI create a complete legal draft in seconds.',        badge:'AI + PDF',     cls:'badge-info'    },
+  { id: 'pipeline',  to:'/pipeline',  icon:GitBranch,     title:'AI Pipeline',       desc:'Full extract → classify → RAG → draft → validate in one click',                  badge:'Recommended',  cls:'badge-gold'    },
+  { id: 'arguments', to:'/arguments', icon:MessageSquare, title:'Argument Writer',   desc:'Generate petitioner & respondent arguments with SC precedents',                   badge:'Precedents',   cls:'badge-warning' },
+  { id: 'validate',  to:'/validate',  icon:CheckCircle,   title:'Validate',          desc:'Check any draft for missing sections and legal compliance',                       badge:'Quality Check',cls:'badge-success' },
+  { id: 'compare',   to:'/compare',   icon:GitCompare,    title:'Compare Docs',      desc:'Detect factual contradictions between petition and counter',                      badge:'Contradiction',cls:'badge-error'   },
+  { id: 'bareacts',  to:'/reference', icon:BookOpen,      title:'Bare Acts',         desc:'Quick-search 10 Indian Acts and 35+ key sections',                               badge:'Reference',    cls:'badge-gold'    },
+]
+
+const PIPELINE = ['User Input','Fact Extraction','Classification','Rule Engine','RAG Retrieval','LLM Draft','Validation','Advocate Review','Output']
+
+const TECH = [
+  ['Python + FastAPI','Backend API'],
+  ['Ollama (Llama 3)','LLM Engine'],
+  ['SentenceTransformers','Embeddings'],
+  ['FAISS','Vector DB'],
+  ['React + Vite','Frontend'],
+  ['ReportLab','PDF Export'],
+  ['RAG Pipeline','Retrieval'],
 import { useState } from 'react'
 import { FileText, GitBranch, CheckCircle, GitCompare, ArrowRight, MessageSquare, BookOpen, FolderOpen, Plus, Search, Filter } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
@@ -11,15 +33,8 @@ const CARDS = [
   { to:'/reference', icon:BookOpen,      title:'Bare Acts',         desc:'Quick-search 10 Indian Acts and 35+ key sections',                               badge:'Reference'    },
 ]
 
-export default function Dashboard() {
+export default function Dashboard({ onModuleSelect }) {
   const navigate = useNavigate()
-  const [search, setSearch] = useState('')
-
-  const filtered = CARDS.filter(c =>
-    c.title.toLowerCase().includes(search.toLowerCase()) ||
-    c.desc.toLowerCase().includes(search.toLowerCase())
-  )
-
   return (
     <div style={{ maxWidth: 960 }}>
       {/* ── Header ── */}
@@ -71,21 +86,12 @@ export default function Dashboard() {
           <div
             key={to}
             className={`glass-card animate-fade-up delay-${Math.min((i+1)*100,300)}`}
-            onClick={() => navigate(to)}
-            style={{
-              padding: '22px 20px', cursor: 'pointer',
-              transition: 'all 0.25s ease',
-              border: '1px solid var(--border)'
-            }}
-            onMouseEnter={e => {
-              e.currentTarget.style.borderColor = '#a3a3a3'
-              e.currentTarget.style.transform = 'translateY(-3px)'
-              e.currentTarget.style.boxShadow = '0 8px 24px rgba(0,0,0,0.08)'
-            }}
-            onMouseLeave={e => {
-              e.currentTarget.style.borderColor = 'var(--border)'
-              e.currentTarget.style.transform = 'translateY(0)'
-              e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.04)'
+            onClick={() => {
+              if (onModuleSelect) {
+                onModuleSelect(id)
+              } else {
+                navigate(to)
+              }
             }}
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 14 }}>
