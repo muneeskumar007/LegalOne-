@@ -10,12 +10,10 @@ import ArgumentPage  from './pages/ArgumentPage'
 import LoginPage     from './pages/LoginPage'
 import SignupPage    from './pages/SignupPage'
 import ProfilePage   from './pages/ProfilePage'
-import Judgement     from './pages/Judgement'
 
 export default function App() {
   return (
     <Routes>
-      {/* Auth pages — no Layout wrapper */}
       <Route path="/login"  element={<LoginPage />}  />
       <Route path="/signup" element={<SignupPage />}  />
 
@@ -30,6 +28,7 @@ export default function App() {
             <Route path="/validate"  element={<ValidatePage />} />
             <Route path="/compare"   element={<ComparePage />}  />
             <Route path="/reference" element={<ReferencePage />}/>
+            <Route path="/my-cases"  element={<JudgementsDashboard />}     />
             <Route path="/profile"   element={<ProfilePage />}  />
           </Routes>
         </Layout>

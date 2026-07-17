@@ -1,56 +1,37 @@
 import { useState } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
+import { Scale, FileText, GitBranch, CheckCircle, GitCompare, Menu, X, Gavel, BookOpen, MessageSquare, LogIn, LogOut, User, ChevronDown, Settings } from 'lucide-react'
 import { NavLink, useNavigate, useLocation } from 'react-router-dom'
 import { Scale, FileText, FolderOpen, LayoutTemplate, BookOpen, Gavel, Settings, Menu, X, LogIn, LogOut, User, ChevronDown } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
+import Dashboard from '../pages/Dashboard'
+import DraftPage from '../pages/DraftPage'
+import PipelinePage from '../pages/PipelinePage'
+import ArgumentPage from '../pages/ArgumentPage'
+import ValidatePage from '../pages/ValidatePage'
+import ComparePage from '../pages/ComparePage'
+import ReferencePage from '../pages/ReferencePage'
+import ProfilePage from '../pages/ProfilePage'
 
 const NAV = [
-  { to:'/draft',      icon: FileText,       label:'AI DRAFTER'   },
-  { to:'/',            icon: FolderOpen,     label:'MY CASES'     },
-  { to:'/reference',   icon: LayoutTemplate, label:'TEMPLATES'    },
-  { to:'/compare',     icon: BookOpen,       label:'BARE ACTS'    },
-  { to:'/judgements',  icon: Gavel,          label:'JUDGEMENTS'   },
-  { to:'/profile',     icon: Settings,       label:'SETTINGS'     },
+  { id:'dashboard', to:'/',          icon:Scale,         label:'Dashboard'   },
+  { id:'pipeline',  to:'/pipeline',  icon:GitBranch,     label:'AI Pipeline' },
+  { id:'draft',     to:'/draft',     icon:FileText,      label:'Draft'       },
+  { id:'arguments', to:'/arguments', icon:MessageSquare, label:'Arguments'   },
+  { id:'validate',  to:'/validate',  icon:CheckCircle,   label:'Validate'    },
+  { id:'compare',   to:'/compare',   icon:GitCompare,    label:'Compare'     },
+  { id:'bareacts',  to:'/reference', icon:BookOpen,      label:'Bare Acts'   },
 ]
 
-/* ── Balance / Scales SVG Logo ── */
-function ScalesLogo({ size = 48 }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
-      {/* ── Top triangular crown / pediment ── */}
-      <polygon points="40,4 33,16 47,16" fill="#0a0a0a"/>
-      {/* Small circle at apex */}
-      <circle cx="40" cy="6" r="2" fill="#0a0a0a"/>
-
-      {/* ── Horizontal beam ── */}
-      <rect x="6" y="15" width="68" height="2.5" rx="1.25" fill="#0a0a0a"/>
-
-      {/* ── Central pillar ── */}
-      <rect x="38.5" y="17" width="3" height="40" fill="#0a0a0a"/>
-      {/* Pillar decorative node */}
-      <circle cx="40" cy="22" r="2.5" fill="#0a0a0a"/>
-
-      {/* ── Base stand ── */}
-      <path d="M28 57 L40 57 L52 57" stroke="#0a0a0a" strokeWidth="2.5" strokeLinecap="round"/>
-      <path d="M24 62 Q32 57 40 57 Q48 57 56 62" stroke="#0a0a0a" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
-      <rect x="22" y="62" width="36" height="2.5" rx="1.25" fill="#0a0a0a"/>
-
-      {/* ── Left side ── */}
-      {/* Left chain / strings */}
-      <line x1="10" y1="17" x2="6" y2="34" stroke="#0a0a0a" strokeWidth="1.8" strokeLinecap="round"/>
-      <line x1="10" y1="17" x2="14" y2="34" stroke="#0a0a0a" strokeWidth="1.8" strokeLinecap="round"/>
-      {/* Left hanging pan / dish */}
-      <path d="M3 34 Q10 46 17 34" stroke="#0a0a0a" strokeWidth="2.2" fill="none" strokeLinecap="round"/>
-      <line x1="3" y1="34" x2="17" y2="34" stroke="#0a0a0a" strokeWidth="1.5" strokeLinecap="round"/>
-
-      {/* ── Right side ── */}
-      {/* Right chain / strings */}
-      <line x1="70" y1="17" x2="66" y2="34" stroke="#0a0a0a" strokeWidth="1.8" strokeLinecap="round"/>
-      <line x1="70" y1="17" x2="74" y2="34" stroke="#0a0a0a" strokeWidth="1.8" strokeLinecap="round"/>
-      {/* Right hanging pan / dish */}
-      <path d="M63 34 Q70 46 77 34" stroke="#0a0a0a" strokeWidth="2.2" fill="none" strokeLinecap="round"/>
-      <line x1="63" y1="34" x2="77" y2="34" stroke="#0a0a0a" strokeWidth="1.5" strokeLinecap="round"/>
-    </svg>
-  )
+const MODULE_BY_PATH = {
+  '/': 'dashboard',
+  '/pipeline': 'pipeline',
+  '/draft': 'draft',
+  '/arguments': 'arguments',
+  '/validate': 'validate',
+  '/compare': 'compare',
+  '/reference': 'bareacts',
+  '/profile': 'profile',
 }
 
 function UserMenu({ advocate, logout }) {
@@ -64,14 +45,8 @@ function UserMenu({ advocate, logout }) {
         background: 'transparent', border: '1px solid var(--border)', borderRadius: 12,
         cursor: 'pointer', width: '100%', transition: 'all 0.2s'
       }}>
-        {/* Avatar circle */}
-        <div style={{
-          width: 36, height: 36, borderRadius: '50%',
-          background: '#e5e5e5',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          flexShrink: 0
-        }}>
-          <User size={18} color="#737373" />
+        <div style={{ width: 28, height: 28, borderRadius: '50%', background: 'linear-gradient(135deg,var(--gold),var(--gold-dim))', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 700, color: '#000000', flexShrink: 0 }}>
+          {initials}
         </div>
         <div style={{ flex: 1, textAlign: 'left', minWidth: 0 }}>
           <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
@@ -117,18 +92,48 @@ function UserMenu({ advocate, logout }) {
   )
 }
 
-export default function Layout({ children }) {
+export default function Layout() {
   const [open, setOpen] = useState(false)
   const { advocate, isLoggedIn, logout } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
+  const [activeModule, setActiveModule] = useState(MODULE_BY_PATH[location.pathname] || 'dashboard')
+  const isDraft = activeModule === 'draft'
+
+  const selectModule = (moduleId) => {
+    setActiveModule(moduleId)
+    setOpen(false)
+  }
+
+  const renderContent = () => {
+    switch (activeModule) {
+      case 'draft':
+        return <DraftPage />
+      case 'pipeline':
+        return <PipelinePage />
+      case 'arguments':
+        return <ArgumentPage />
+      case 'validate':
+        return <ValidatePage />
+      case 'compare':
+        return <ComparePage />
+      case 'bareacts':
+        return <ReferencePage />
+      case 'profile':
+        return <ProfilePage />
+      case 'dashboard':
+      default:
+        return <Dashboard onModuleSelect={selectModule} />
+    }
+  }
 
   const SidebarContent = () => (
     <>
-      {/* ── Logo ── */}
-      <div style={{ padding: '28px 24px 24px', textAlign: 'center' }}>
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
-          <ScalesLogo size={52} />
+      <div style={{ padding: '22px 20px 14px', borderBottom: '1px solid var(--border)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <div style={{ width: 36, height: 36, borderRadius: 8, background: 'linear-gradient(135deg,var(--gold),var(--gold-dim))', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 0 18px rgba(255,255,255,0.18)' }}>
+            <Gavel size={17} color="#000000" strokeWidth={2.5} />
+          </div>
           <div>
             <div style={{
               fontFamily: 'Playfair Display, serif', fontWeight: 700, fontSize: 20,
@@ -146,17 +151,15 @@ export default function Layout({ children }) {
         </div>
       </div>
 
-      {/* ── Navigation ── */}
-      <nav style={{ padding: '0 14px', flex: 1, overflowY: 'auto' }}>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-          {NAV.map(({ to, icon: Icon, label }) => (
-            <NavLink key={to + label} to={to} end={to==='/'} onClick={() => setOpen(false)}
-              className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
-              style={{ marginBottom: 0 }}>
-              <Icon size={18} strokeWidth={1.5} /><span style={{ letterSpacing: '0.06em', fontSize: 13 }}>{label}</span>
-            </NavLink>
-          ))}
-        </div>
+      <nav style={{ padding: '10px 10px', flex: 1, overflowY: 'auto' }}>
+        <div style={{ fontSize: 10, color: 'var(--text-muted)', letterSpacing: '0.1em', textTransform: 'uppercase', padding: '0 4px 6px', marginBottom: 4 }}>Navigation</div>
+        {NAV.map(({ id, to, icon: Icon, label }) => (
+          <a key={to} href={to} onClick={(e) => { e.preventDefault(); selectModule(id) }}
+            className={`nav-item ${activeModule === id ? 'active' : ''}`}
+            style={{ marginBottom: 2 }}>
+            <Icon size={14} /><span>{label}</span>
+          </a>
+        ))}
       </nav>
 
       {/* ── Bottom Section ── */}
@@ -245,22 +248,25 @@ export default function Layout({ children }) {
         <SidebarContent />
       </aside>
 
-      {/* Main Content */}
-      <main style={{
-        marginLeft: 250, flex: 1,
-        padding: '36px 40px 40px',
-        minHeight: '100vh',
-        maxWidth: 'calc(100vw - 250px)',
-        boxSizing: 'border-box',
-        background: 'var(--bg-secondary)'
-      }} className="main-content">
-        {children}
+      <main
+        style={{
+          marginLeft: 220,
+          flex: 1,
+          padding: isDraft ? 0 : '36px 32px 40px',
+          minHeight: '100vh',
+          boxSizing: 'border-box',
+          overflow: isDraft ? 'auto' : undefined,
+        }}
+        className={`main-content ${isDraft ? 'draft-main' : ''}`}
+      >
+        {renderContent()}
       </main>
 
       <style>{`
         @media (max-width: 768px) {
           .sidebar-desktop { display: none !important; }
-          .main-content { margin-left: 0 !important; max-width: 100vw !important; padding: 72px 16px 32px !important; }
+          .main-content { margin-left: 0 !important; padding: 68px 16px 32px !important; }
+          .main-content.draft-main { padding: 52px 0 0 !important; }
         }
         @media (min-width: 769px) {
           .mobile-header, .mobile-drawer { display: none !important; }
