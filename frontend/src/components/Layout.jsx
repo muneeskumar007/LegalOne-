@@ -1,17 +1,36 @@
 import { useState } from 'react'
-import { NavLink, useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { Scale, FileText, GitBranch, CheckCircle, GitCompare, Menu, X, Gavel, BookOpen, MessageSquare, LogIn, LogOut, User, ChevronDown, Settings } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
+import Dashboard from '../pages/Dashboard'
+import DraftPage from '../pages/DraftPage'
+import PipelinePage from '../pages/PipelinePage'
+import ArgumentPage from '../pages/ArgumentPage'
+import ValidatePage from '../pages/ValidatePage'
+import ComparePage from '../pages/ComparePage'
+import ReferencePage from '../pages/ReferencePage'
+import ProfilePage from '../pages/ProfilePage'
 
 const NAV = [
-  { to:'/',          icon:Scale,         label:'Dashboard'   },
-  { to:'/pipeline',  icon:GitBranch,     label:'AI Pipeline' },
-  { to:'/draft',     icon:FileText,      label:'Draft'       },
-  { to:'/arguments', icon:MessageSquare, label:'Arguments'   },
-  { to:'/validate',  icon:CheckCircle,   label:'Validate'    },
-  { to:'/compare',   icon:GitCompare,    label:'Compare'     },
-  { to:'/reference', icon:BookOpen,      label:'Bare Acts'   },
+  { id:'dashboard', to:'/',          icon:Scale,         label:'Dashboard'   },
+  { id:'pipeline',  to:'/pipeline',  icon:GitBranch,     label:'AI Pipeline' },
+  { id:'draft',     to:'/draft',     icon:FileText,      label:'Draft'       },
+  { id:'arguments', to:'/arguments', icon:MessageSquare, label:'Arguments'   },
+  { id:'validate',  to:'/validate',  icon:CheckCircle,   label:'Validate'    },
+  { id:'compare',   to:'/compare',   icon:GitCompare,    label:'Compare'     },
+  { id:'bareacts',  to:'/reference', icon:BookOpen,      label:'Bare Acts'   },
 ]
+
+const MODULE_BY_PATH = {
+  '/': 'dashboard',
+  '/pipeline': 'pipeline',
+  '/draft': 'draft',
+  '/arguments': 'arguments',
+  '/validate': 'validate',
+  '/compare': 'compare',
+  '/reference': 'bareacts',
+  '/profile': 'profile',
+}
 
 function UserMenu({ advocate, logout }) {
   const [open, setOpen] = useState(false)
@@ -25,7 +44,7 @@ function UserMenu({ advocate, logout }) {
         background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 8,
         cursor: 'pointer', width: '100%', transition: 'all 0.2s'
       }}>
-        <div style={{ width: 28, height: 28, borderRadius: '50%', background: 'linear-gradient(135deg,var(--gold),var(--gold-dim))', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 700, color: '#0f0d0a', flexShrink: 0 }}>
+        <div style={{ width: 28, height: 28, borderRadius: '50%', background: 'linear-gradient(135deg,var(--gold),var(--gold-dim))', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 700, color: '#000000', flexShrink: 0 }}>
           {initials}
         </div>
         <div style={{ flex: 1, textAlign: 'left', minWidth: 0 }}>
@@ -54,17 +73,47 @@ function UserMenu({ advocate, logout }) {
   )
 }
 
-export default function Layout({ children }) {
+export default function Layout() {
   const [open, setOpen] = useState(false)
   const { advocate, isLoggedIn, logout } = useAuth()
   const navigate = useNavigate()
+  const location = useLocation()
+  const [activeModule, setActiveModule] = useState(MODULE_BY_PATH[location.pathname] || 'dashboard')
+  const isDraft = activeModule === 'draft'
+
+  const selectModule = (moduleId) => {
+    setActiveModule(moduleId)
+    setOpen(false)
+  }
+
+  const renderContent = () => {
+    switch (activeModule) {
+      case 'draft':
+        return <DraftPage />
+      case 'pipeline':
+        return <PipelinePage />
+      case 'arguments':
+        return <ArgumentPage />
+      case 'validate':
+        return <ValidatePage />
+      case 'compare':
+        return <ComparePage />
+      case 'bareacts':
+        return <ReferencePage />
+      case 'profile':
+        return <ProfilePage />
+      case 'dashboard':
+      default:
+        return <Dashboard onModuleSelect={selectModule} />
+    }
+  }
 
   const SidebarContent = () => (
     <>
       <div style={{ padding: '22px 20px 14px', borderBottom: '1px solid var(--border)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <div style={{ width: 36, height: 36, borderRadius: 8, background: 'linear-gradient(135deg,var(--gold),var(--gold-dim))', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 0 18px rgba(212,168,67,0.3)' }}>
-            <Gavel size={17} color="#0f0d0a" strokeWidth={2.5} />
+          <div style={{ width: 36, height: 36, borderRadius: 8, background: 'linear-gradient(135deg,var(--gold),var(--gold-dim))', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 0 18px rgba(255,255,255,0.18)' }}>
+            <Gavel size={17} color="#000000" strokeWidth={2.5} />
           </div>
           <div>
             <div style={{ fontFamily: 'Playfair Display,serif', fontWeight: 700, fontSize: 16, color: 'var(--text-primary)', lineHeight: 1 }}>
@@ -77,12 +126,12 @@ export default function Layout({ children }) {
 
       <nav style={{ padding: '10px 10px', flex: 1, overflowY: 'auto' }}>
         <div style={{ fontSize: 10, color: 'var(--text-muted)', letterSpacing: '0.1em', textTransform: 'uppercase', padding: '0 4px 6px', marginBottom: 4 }}>Navigation</div>
-        {NAV.map(({ to, icon: Icon, label }) => (
-          <NavLink key={to} to={to} end={to==='/'} onClick={() => setOpen(false)}
-            className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
+        {NAV.map(({ id, to, icon: Icon, label }) => (
+          <a key={to} href={to} onClick={(e) => { e.preventDefault(); selectModule(id) }}
+            className={`nav-item ${activeModule === id ? 'active' : ''}`}
             style={{ marginBottom: 2 }}>
             <Icon size={14} /><span>{label}</span>
-          </NavLink>
+          </a>
         ))}
       </nav>
 
@@ -128,14 +177,25 @@ export default function Layout({ children }) {
         <SidebarContent />
       </aside>
 
-      <main style={{ marginLeft: 220, flex: 1, padding: '36px 32px 40px', minHeight: '100vh', maxWidth: 'calc(100vw - 220px)', boxSizing: 'border-box' }} className="main-content">
-        {children}
+      <main
+        style={{
+          marginLeft: 220,
+          flex: 1,
+          padding: isDraft ? 0 : '36px 32px 40px',
+          minHeight: '100vh',
+          boxSizing: 'border-box',
+          overflow: isDraft ? 'auto' : undefined,
+        }}
+        className={`main-content ${isDraft ? 'draft-main' : ''}`}
+      >
+        {renderContent()}
       </main>
 
       <style>{`
         @media (max-width: 768px) {
           .sidebar-desktop { display: none !important; }
-          .main-content { margin-left: 0 !important; max-width: 100vw !important; padding: 68px 16px 32px !important; }
+          .main-content { margin-left: 0 !important; padding: 68px 16px 32px !important; }
+          .main-content.draft-main { padding: 52px 0 0 !important; }
         }
         @media (min-width: 769px) {
           .mobile-header, .mobile-drawer { display: none !important; }

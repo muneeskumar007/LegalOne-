@@ -1,15 +1,13 @@
-import { useState } from 'react'
 import { Scale, FileText, GitBranch, CheckCircle, GitCompare, ArrowRight, Gavel, MessageSquare, BookOpen } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
-import DraftPage from './DraftPage'
 
 const CARDS = [
   { id: 'draft',     to:'/draft',     icon:FileText,      title:'AI Drafter',        desc:'Describe your case and let AI create a complete legal draft in seconds.',        badge:'AI + PDF',     cls:'badge-info'    },
-  { id: null,        to:'/pipeline',  icon:GitBranch,     title:'AI Pipeline',       desc:'Full extract → classify → RAG → draft → validate in one click',                  badge:'Recommended',  cls:'badge-gold'    },
-  { id: null,        to:'/arguments', icon:MessageSquare, title:'Argument Writer',   desc:'Generate petitioner & respondent arguments with SC precedents',                   badge:'Precedents',   cls:'badge-warning' },
-  { id: null,        to:'/validate',  icon:CheckCircle,   title:'Validate',          desc:'Check any draft for missing sections and legal compliance',                       badge:'Quality Check',cls:'badge-success' },
-  { id: null,        to:'/compare',   icon:GitCompare,    title:'Compare Docs',      desc:'Detect factual contradictions between petition and counter',                      badge:'Contradiction',cls:'badge-error'   },
-  { id: null,        to:'/reference', icon:BookOpen,      title:'Bare Acts',         desc:'Quick-search 10 Indian Acts and 35+ key sections',                               badge:'Reference',    cls:'badge-gold'    },
+  { id: 'pipeline',  to:'/pipeline',  icon:GitBranch,     title:'AI Pipeline',       desc:'Full extract → classify → RAG → draft → validate in one click',                  badge:'Recommended',  cls:'badge-gold'    },
+  { id: 'arguments', to:'/arguments', icon:MessageSquare, title:'Argument Writer',   desc:'Generate petitioner & respondent arguments with SC precedents',                   badge:'Precedents',   cls:'badge-warning' },
+  { id: 'validate',  to:'/validate',  icon:CheckCircle,   title:'Validate',          desc:'Check any draft for missing sections and legal compliance',                       badge:'Quality Check',cls:'badge-success' },
+  { id: 'compare',   to:'/compare',   icon:GitCompare,    title:'Compare Docs',      desc:'Detect factual contradictions between petition and counter',                      badge:'Contradiction',cls:'badge-error'   },
+  { id: 'bareacts',  to:'/reference', icon:BookOpen,      title:'Bare Acts',         desc:'Quick-search 10 Indian Acts and 35+ key sections',                               badge:'Reference',    cls:'badge-gold'    },
 ]
 
 const PIPELINE = ['User Input','Fact Extraction','Classification','Rule Engine','RAG Retrieval','LLM Draft','Validation','Advocate Review','Output']
@@ -24,31 +22,9 @@ const TECH = [
   ['RAG Pipeline','Retrieval'],
 ]
 
-export default function Dashboard() {
+export default function Dashboard({ onModuleSelect }) {
   const navigate = useNavigate()
-  const [activeModule, setActiveModule] = useState(null)
 
-  /* ── If a module is active, render it in place of the dashboard ── */
-  if (activeModule === 'draft') {
-    return (
-      <div style={{ margin: '-36px -32px -40px', minHeight: '100vh' }}>
-        {/* Back button strip */}
-        <div style={{ padding: '10px 20px', background: 'var(--bg-secondary)', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center' }}>
-          <button
-            onClick={() => setActiveModule(null)}
-            style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'none', border: 'none', color: 'var(--text-muted)', fontSize: 12, cursor: 'pointer', padding: '4px 8px', borderRadius: 6 }}
-            onMouseEnter={e => e.currentTarget.style.color = 'var(--text-primary)'}
-            onMouseLeave={e => e.currentTarget.style.color = 'var(--text-muted)'}
-          >
-            ← Back to Dashboard
-          </button>
-        </div>
-        <DraftPage />
-      </div>
-    )
-  }
-
-  /* ── Default: Dashboard home ─────────────────────────────────────── */
   return (
     <div style={{ maxWidth: 920 }}>
       {/* Hero */}
@@ -85,8 +61,8 @@ export default function Dashboard() {
             key={to}
             className={`glass-card animate-fade-up delay-${Math.min((i+1)*100,300)}`}
             onClick={() => {
-              if (id === 'draft') {
-                setActiveModule('draft')
+              if (onModuleSelect) {
+                onModuleSelect(id)
               } else {
                 navigate(to)
               }
