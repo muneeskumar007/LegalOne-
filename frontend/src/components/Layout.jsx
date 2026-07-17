@@ -1,8 +1,8 @@
 import { useState } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
+ 
 import { Scale, FileText, GitBranch, CheckCircle, GitCompare, Menu, X, Gavel, BookOpen, MessageSquare, LogIn, LogOut, User, ChevronDown, Settings } from 'lucide-react'
 import { NavLink, useNavigate, useLocation } from 'react-router-dom'
-import { Scale, FileText, FolderOpen, LayoutTemplate, BookOpen, Gavel, Settings, Menu, X, LogIn, LogOut, User, ChevronDown } from 'lucide-react'
+ 
 import { useAuth } from '../context/AuthContext'
 import Dashboard from '../pages/Dashboard'
 import DraftPage from '../pages/DraftPage'
@@ -224,7 +224,7 @@ export default function Layout() {
         padding: '0 16px', zIndex: 60
       }} className="mobile-header">
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <ScalesLogo size={28} />
+          <Scale size={28} />
           <span style={{ fontFamily: 'Playfair Display, serif', fontWeight: 700, fontSize: 16 }}>LegalOne AI</span>
         </div>
         <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>

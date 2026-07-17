@@ -1,5 +1,7 @@
-import { Scale, FileText, GitBranch, CheckCircle, GitCompare, ArrowRight, Gavel, MessageSquare, BookOpen } from 'lucide-react'
+import { Scale, FileText, GitBranch, CheckCircle, GitCompare, ArrowRight, Gavel, MessageSquare, BookOpen, Plus, Search, FolderOpen } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
+import { useState } from 'react'
+
 
 const CARDS = [
   { id: 'draft',     to:'/draft',     icon:FileText,      title:'AI Drafter',        desc:'Describe your case and let AI create a complete legal draft in seconds.',        badge:'AI + PDF',     cls:'badge-info'    },
@@ -19,22 +21,15 @@ const TECH = [
   ['FAISS','Vector DB'],
   ['React + Vite','Frontend'],
   ['ReportLab','PDF Export'],
-  ['RAG Pipeline','Retrieval'],
-import { useState } from 'react'
-import { FileText, GitBranch, CheckCircle, GitCompare, ArrowRight, MessageSquare, BookOpen, FolderOpen, Plus, Search, Filter } from 'lucide-react'
-import { useNavigate } from 'react-router-dom'
+  ['RAG Pipeline','Retrieval']]
 
-const CARDS = [
-  { to:'/draft',     icon:FileText,      title:'AI Drafter',        desc:'Describe your case and let AI create a complete legal draft in seconds.',        badge:'AI + PDF'     },
-  { to:'/pipeline',  icon:GitBranch,     title:'AI Pipeline',       desc:'Full extract → classify → RAG → draft → validate in one click',                  badge:'Recommended'  },
-  { to:'/arguments', icon:MessageSquare, title:'Argument Writer',   desc:'Generate petitioner & respondent arguments with SC precedents',                   badge:'Precedents'   },
-  { to:'/validate',  icon:CheckCircle,   title:'Validate',          desc:'Check any draft for missing sections and legal compliance',                       badge:'Quality'      },
-  { to:'/compare',   icon:GitCompare,    title:'Compare Docs',      desc:'Detect factual contradictions between petition and counter',                      badge:'Contradiction'},
-  { to:'/reference', icon:BookOpen,      title:'Bare Acts',         desc:'Quick-search 10 Indian Acts and 35+ key sections',                               badge:'Reference'    },
-]
+ 
 
 export default function Dashboard({ onModuleSelect }) {
   const navigate = useNavigate()
+  const [search, setSearch] = useState('')
+  const filtered = CARDS.filter(card => card.title.toLowerCase().includes(search.toLowerCase()))
+
   return (
     <div style={{ maxWidth: 960 }}>
       {/* ── Header ── */}
@@ -82,7 +77,7 @@ export default function Dashboard({ onModuleSelect }) {
         gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))',
         gap: 16
       }}>
-        {filtered.map(({ to, icon: Icon, title, desc, badge }, i) => (
+        {filtered.map(({ id, to, icon: Icon, title, desc, badge }, i) => (
           <div
             key={to}
             className={`glass-card animate-fade-up delay-${Math.min((i+1)*100,300)}`}
