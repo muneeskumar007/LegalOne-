@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { NavLink, useNavigate, useLocation } from 'react-router-dom'
-import { Scale, FileText, FolderOpen, LayoutTemplate, BookOpen, Gavel, Settings, Menu, X, LogIn, LogOut, User, ChevronDown } from 'lucide-react'
+import { Scale, FileText, FolderOpen, LayoutTemplate, BookOpen, Gavel, Settings, Menu, X, LogIn, LogOut, User, ChevronDown, GitBranch, GitCompare, MessageSquare, CheckCircle } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 
 const NAV = [
