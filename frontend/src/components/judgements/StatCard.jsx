@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion'
 
 /**
- * StatCard — reusable metric card for the Judgements Dashboard.
+ * StatCard — reusable metric card for the AI Drafter dashboard.
  *
  * Props:
  *   title       {string}       Card heading
@@ -29,11 +29,13 @@ export default function StatCard({
   loading = false,
 }) {
   const { icon: iconCls, card: cardCls } = ACCENT_MAP[accent] ?? ACCENT_MAP.blue
+  const numericScore = title === 'Score' && value != null && Number.isFinite(Number(value))
+  const score = numericScore ? Math.min(100, Math.max(0, Number(value))) : null
 
   return (
     <motion.article
       className={`jd-stat-card ${cardCls}`}
-      whileHover={{ y: -4, boxShadow: '0 12px 32px rgba(31,49,84,.1)' }}
+      whileHover={{ boxShadow: '0 2px 6px rgba(0,0,0,.06)' }}
       transition={{ duration: 0.2, ease: 'easeOut' }}
       aria-label={`${title} metric card`}
     >
@@ -46,17 +48,21 @@ export default function StatCard({
         </>
       ) : (
         <>
-          <motion.span
-            className={`jd-stat-icon ${iconCls}`}
-            aria-hidden="true"
-            whileHover={{ scale: 1.1 }}
-            transition={{ duration: 0.15 }}
-          >
-            <Icon size={18} strokeWidth={2} />
-          </motion.span>
+          {numericScore ? (
+            <span className="jd-score-circle" style={{ '--jd-score-progress': `${score * 3.6}deg` }} aria-label={`Score ${score} percent`}>
+              <span className="jd-score-number">{score}</span>
+              <span className="jd-score-label">SCORE</span>
+            </span>
+          ) : (
+            <span className={`jd-stat-icon ${iconCls}`} aria-hidden="true">
+              <Icon size={16} strokeWidth={2} />
+            </span>
+          )}
+          <div className="jd-stat-text">
           <p className="jd-stat-title">{title}</p>
           <p className="jd-stat-value">{value ?? '—'}</p>
           <p className="jd-stat-description">{description}</p>
+          </div>
           {/* decorative circle */}
           <span className="jd-sc-deco" aria-hidden="true" />
         </>

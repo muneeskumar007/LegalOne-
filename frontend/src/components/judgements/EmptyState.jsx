@@ -10,8 +10,8 @@ import { FileSearch } from 'lucide-react'
  *   icon        {Component} — optional custom Lucide icon (defaults to FileSearch)
  */
 export default function EmptyState({
-  title = 'No judgement data available',
-  description = 'Judgements will appear here once data is received from the backend.',
+  title = 'No draft data available',
+  description = 'Drafts will appear here once data is received from the backend.',
   icon: Icon = FileSearch,
 }) {
   return (

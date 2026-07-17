@@ -1,20 +1,22 @@
 import { useState } from 'react'
-import {
-  Award, CircleHelp, FileCheck2, Gavel,
-  Moon, Plus, Scale, Sparkles, Sun, UserRound,
-} from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
+import { Award, FileCheck2, Gavel, Plus, Scale, Sparkles } from 'lucide-react'
 import { motion } from 'framer-motion'
+import { Toaster } from 'react-hot-toast'
 
-import StatCard       from '../components/judgements/StatCard'
-import CategoryTabs   from '../components/judgements/CategoryTabs'
-import SearchToolbar  from '../components/judgements/SearchToolbar'
-import JudgementTable from '../components/judgements/JudgementTable'
-import Pagination     from '../components/judgements/Pagination'
+import StatCard        from '../components/judgements/StatCard'
+import CategoryTabs    from '../components/judgements/CategoryTabs'
+import SearchToolbar   from '../components/judgements/SearchToolbar'
+import JudgementTable  from '../components/judgements/JudgementTable'
+import Pagination      from '../components/judgements/Pagination'
+import HelpButton      from '../components/HeaderActions/HelpButton'
+import ThemeToggle     from '../components/HeaderActions/ThemeToggle'
+import ProfileDropdown from '../components/HeaderActions/ProfileDropdown'
 
 /* ─── Static config (no business values) ───────────────────────────── */
 
 const STAT_CONFIG = [
-  { title: 'Score',          description: 'Overall draft assessment',  icon: Award,     accent: 'blue'    },
+  { title: 'Score',          description: 'Overall draft assessment',  icon: Award,      accent: 'blue'    },
   { title: 'Completeness',   description: 'Required case details',     icon: FileCheck2, accent: 'indigo'  },
   { title: 'Legal Accuracy', description: 'Legal reasoning review',    icon: Scale,      accent: 'violet'  },
   { title: 'Clarity',        description: 'Language & structure',      icon: Sparkles,   accent: 'emerald' },
@@ -81,41 +83,87 @@ const stagger = {
 /* ─── Component ─────────────────────────────────────────────────────── */
 
 /**
- * JudgementsDashboard
+ * JudgementsDashboard (AI Drafter)
  *
- * Top-level page component for the Judgements / My Cases view.
+ * Top-level page component for the AI Drafter / My Cases view.
  *
  * All state-managed values (search, filters, active tab) are controlled here
  * and passed down as props. When backend integration begins, only the API call
- * and the `judgements`, `loading`, `page`, `totalPages`, `totalRecords` state
+ * and the `drafts`, `loading`, `page`, `totalPages`, `totalRecords` state
  * needs to be wired up — no child component changes required.
  */
 export default function JudgementsDashboard() {
+  const navigate = useNavigate()
+
   /* UI state only — no API calls */
   const [activeTab,    setActiveTab]    = useState('All Cases')
   const [search,       setSearch]       = useState('')
   const [filterValues, setFilterValues] = useState({ type: '', status: '', modified: '' })
-  const [darkHeader,   setDarkHeader]   = useState(false)
+  const [appliedSearch, setAppliedSearch] = useState('')
+  const [appliedFilters, setAppliedFilters] = useState({ type: '', status: '', modified: '' })
   const [page,         setPage]         = useState(1)
 
-  /* Future: replace these with API-sourced values */
-  const judgements  = []
-  const loading     = false
-  const totalPages  = undefined
-  const totalRecords= undefined
-  const pageSize    = 6
-  const stats       = STAT_CONFIG.map((s) => ({ ...s, value: undefined }))
+  /* Future: replace these with API-sourced values from the draft/case list API */
+  const judgements   = []
+  const loading      = false
+  const totalPages   = undefined
+  const totalRecords = undefined
+  const pageSize     = 6
+  const stats        = STAT_CONFIG.map((s) => ({ ...s, value: undefined }))
 
-  /* Handlers (no-op until backend is connected) */
+  const activeFilterCount = [
+    appliedSearch.trim(),
+    ...Object.values(appliedFilters),
+  ].filter(Boolean).length
+
+  const visibleJudgements = judgements.filter((draft) => {
+    const query = appliedSearch.trim().toLowerCase()
+    const matchesSearch = !query || [
+      draft.title,
+      draft.parties,
+      draft.caseNo,
+      draft.caseNumber,
+      draft.type,
+      draft.case_type,
+    ].some((value) => String(value || '').toLowerCase().includes(query))
+
+    const matchesType = !appliedFilters.type || String(draft.type || draft.case_type || '').toLowerCase() === appliedFilters.type
+    const matchesStatus = !appliedFilters.status || String(draft.status || '').toLowerCase() === appliedFilters.status
+    const matchesModified = !appliedFilters.modified || String(draft.modifiedRange || draft.modified || '').toLowerCase().includes(appliedFilters.modified)
+
+    return matchesSearch && matchesType && matchesStatus && matchesModified
+  })
+
+  /* Handlers (UI-only until backend is connected) */
   function handleFilterChange(name, value) {
     setFilterValues((prev) => ({ ...prev, [name]: value }))
   }
-  function handleView(judgement)     { /* onView handler placeholder     */ void judgement }
-  function handleContinue(judgement) { /* onContinue handler placeholder */ void judgement }
-  function handleEdit(judgement)     { /* onEdit handler placeholder     */ void judgement }
-  function handleShare(judgement)    { /* onShare handler placeholder    */ void judgement }
-  function handleDelete(judgement)   { /* onDelete handler placeholder   */ void judgement }
-  function handleNewDraft()          { /* onNewDraft handler placeholder */ }
+  function handleApplyFilters() {
+    setAppliedSearch(search)
+    setAppliedFilters(filterValues)
+    setPage(1)
+  }
+  function handleClearFilters() {
+    const cleared = { type: '', status: '', modified: '' }
+    setSearch('')
+    setFilterValues(cleared)
+    setAppliedSearch('')
+    setAppliedFilters(cleared)
+    setPage(1)
+  }
+  function handleView(draft)     { /* onView handler placeholder     */ void draft }
+  function handleContinue(draft) { /* onContinue handler placeholder */ void draft }
+  function handleEdit(draft)     { /* onEdit handler placeholder     */ void draft }
+  function handleShare(draft)    { /* onShare handler placeholder    */ void draft }
+  function handleDelete(draft)   { /* onDelete handler placeholder   */ void draft }
+
+  /**
+   * handleNewDraft — navigates immediately to the existing /draft route.
+   * This does NOT depend on draft/case list API responses or loading state.
+   */
+  function handleNewDraft() {
+    navigate('/draft')
+  }
 
   /* Merge filter values into config for SearchToolbar */
   const filtersWithValues = FILTERS_CONFIG.map((f) => ({
@@ -125,6 +173,20 @@ export default function JudgementsDashboard() {
 
   return (
     <section className="jd-page">
+      {/* Toast notifications (react-hot-toast) */}
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          style: {
+            fontFamily: 'Inter, DM Sans, system-ui, sans-serif',
+            fontSize: 13,
+            borderRadius: 8,
+            border: '1px solid #E5E7EB',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
+          },
+        }}
+      />
+
       {/* ── Header ──────────────────────────────────────────────────── */}
       <motion.header
         className="jd-app-header"
@@ -142,31 +204,14 @@ export default function JudgementsDashboard() {
         </div>
 
         <div className="jd-header-actions">
-          <button
-            type="button"
-            aria-label="Help"
-            title="Help"
-          >
-            <CircleHelp size={18} />
-          </button>
+          {/* Help — opens AI Drafter help modal */}
+          <HelpButton />
 
-          <button
-            type="button"
-            aria-label="Toggle theme"
-            title="Toggle theme"
-            onClick={() => setDarkHeader((d) => !d)}
-          >
-            {darkHeader ? <Sun size={17} /> : <Moon size={17} />}
-          </button>
+          {/* Theme toggle — light ↔ dark */}
+          <ThemeToggle />
 
-          <button
-            type="button"
-            className="jd-profile-button"
-            aria-label="User profile"
-            title="User profile"
-          >
-            <UserRound size={17} />
-          </button>
+          {/* Profile avatar — dropdown with My Profile, Settings, Logout */}
+          <ProfileDropdown />
         </div>
       </motion.header>
 
@@ -208,16 +253,20 @@ export default function JudgementsDashboard() {
             <p>View, manage and continue your legal drafting work.</p>
           </div>
 
+          {/*
+           * + New Draft button — navigates immediately to /draft.
+           * NOT gated on any draft/case list API loading state.
+           */}
           <motion.button
             type="button"
             className="jd-primary-button"
             onClick={handleNewDraft}
             aria-label="Create a new draft"
-            whileHover={{ scale: 1.03, boxShadow: '0 8px 20px rgba(45,74,148,.28)' }}
+            whileHover={{ scale: 1.02, background: '#1f2937' }}
             whileTap={{ scale: 0.97 }}
             transition={{ duration: 0.15 }}
           >
-            <Plus size={16} aria-hidden="true" />
+            <Plus size={15} aria-hidden="true" />
             New Draft
           </motion.button>
         </div>
@@ -235,11 +284,14 @@ export default function JudgementsDashboard() {
           filters={filtersWithValues}
           onSearch={setSearch}
           onFilterChange={handleFilterChange}
+          onFilter={handleApplyFilters}
+          onClearFilters={handleClearFilters}
+          activeFilterCount={activeFilterCount}
         />
 
         {/* Table */}
         <JudgementTable
-          judgements={judgements}
+          judgements={visibleJudgements}
           loading={loading}
           onView={handleView}
           onContinue={handleContinue}

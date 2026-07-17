@@ -129,7 +129,7 @@ export default function Layout({ children }) {
         <SidebarContent />
       </aside>
 
-      <main style={{ marginLeft: 220, flex: 1, padding: '36px 32px 40px', minHeight: '100vh', maxWidth: 'calc(100vw - 220px)', boxSizing: 'border-box' }} className="main-content">
+      <main style={{ marginLeft: 220, flex: 1, padding: '36px 32px 40px', minHeight: '100vh', maxWidth: 'calc(100vw - 220px)', boxSizing: 'border-box', background: 'var(--jd-page-bg, #ffffff)' }} className="main-content">
         {children}
       </main>
 

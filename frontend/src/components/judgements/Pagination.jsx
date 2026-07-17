@@ -42,7 +42,7 @@ export default function Pagination({
   return (
     <nav
       className="jd-pagination"
-      aria-label="Judgements pagination"
+      aria-label="Drafts pagination"
       role="navigation"
     >
       {/* Record count label */}

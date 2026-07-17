@@ -15,7 +15,7 @@ export default function CategoryChip({ label, count, active, onClick }) {
       type="button"
       role="tab"
       aria-selected={active}
-      className={`jd-category-chip${active ? ' is-active' : ''}`}
+      className={`jd-tab-btn${active ? ' is-active' : ''}`}
       onClick={onClick}
       whileHover={{ y: -1 }}
       whileTap={{ scale: 0.96 }}
