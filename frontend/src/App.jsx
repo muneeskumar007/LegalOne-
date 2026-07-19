@@ -11,6 +11,9 @@ import LoginPage     from './pages/LoginPage'
 import SignupPage    from './pages/SignupPage'
 import ProfilePage   from './pages/ProfilePage'
 import JudgementsDashboard from './pages/JudgementsDashboard'
+import MyCasesPage   from './pages/Mycases'
+import RagStatusPage from './pages/RagStatusPage'
+
 
 export default function App() {
   return (
@@ -30,7 +33,10 @@ export default function App() {
             <Route path="/validate"  element={<ValidatePage />} />
             <Route path="/compare"   element={<ComparePage />}  />
             <Route path="/reference" element={<ReferencePage />}/>
-            <Route path="/my-cases"  element={<JudgementsDashboard />}     />
+            <Route path="/my-cases"  element={<MyCasesPage />} />
+
+<Route path="/rag" element={<RagStatusPage />} />
+
             <Route path="/profile"   element={<ProfilePage />}  />
           </Routes>
         </Layout>

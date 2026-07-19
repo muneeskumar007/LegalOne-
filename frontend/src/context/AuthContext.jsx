@@ -47,7 +47,10 @@ export function AuthProvider({ children }) {
       _save(data.access_token, data.advocate)
       return { success: true, message: data.message }
     } catch(e) {
-      const msg = e.response?.data?.detail || 'Login failed'
+      const isNetwork = !e.response
+      const msg = isNetwork
+        ? 'Cannot connect to server. Please ensure the backend is running.'
+        : (e.response?.data?.detail || 'Invalid email or password')
       setError(msg)
       return { success: false, message: msg }
     } finally { setLoading(false) }
@@ -60,7 +63,10 @@ export function AuthProvider({ children }) {
       _save(data.access_token, data.advocate)
       return { success: true, message: data.message }
     } catch(e) {
-      const msg = e.response?.data?.detail || e.response?.data?.message || 'Signup failed'
+      const isNetwork = !e.response
+      const msg = isNetwork
+        ? 'Cannot connect to server. Please ensure the backend is running.'
+        : (e.response?.data?.detail || e.response?.data?.message || 'Registration failed. Try a different email.')
       setError(msg)
       return { success: false, message: msg }
     } finally { setLoading(false) }

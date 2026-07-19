@@ -1,17 +1,21 @@
 import { useState } from 'react'
 import { NavLink, useNavigate, useLocation } from 'react-router-dom'
-import { Scale, FileText, FolderOpen, LayoutTemplate, BookOpen, Gavel, Settings, Menu, X, LogIn, LogOut, User, ChevronDown, GitBranch, GitCompare, MessageSquare, CheckCircle } from 'lucide-react'
+import { Scale, FileText, FolderOpen, LayoutTemplate,Database, BookOpen, Gavel, Settings, Menu, X, LogIn, LogOut, User, ChevronDown, GitBranch, GitCompare, MessageSquare, CheckCircle } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 
 const NAV = [
   { to:'/',          icon:Scale,         label:'Dashboard'   },
-  { to:'/pipeline',  icon:GitBranch,     label:'AI Pipeline' },
-  { to:'/draft',     icon:FileText,      label:'Draft'       },
+   { to:'/draft',     icon:FileText,      label:'AI Drafter'       },
+   { to:'/my-cases',  icon:null,          label:'My Cases', iconUrl:'https://img.icons8.com/fluency-systems-filled/48/d4a843/briefcase.png' },
+    { to:'/reference', icon:BookOpen,      label:'Bare Acts'   },
+   { to:'/pipeline',  icon:GitBranch,     label:'AI Pipeline' },
+   { to:'/rag', icon:Database, label:'RAG Status' },
+ 
   { to:'/arguments', icon:MessageSquare, label:'Arguments'   },
   { to:'/validate',  icon:CheckCircle,   label:'Validate'    },
   { to:'/compare',   icon:GitCompare,    label:'Compare'     },
-  { to:'/reference', icon:BookOpen,      label:'Bare Acts'   },
-  { to:'/my-cases',  icon:null,          label:'My Cases', iconUrl:'https://img.icons8.com/fluency-systems-filled/48/d4a843/briefcase.png' },
+
+  
 ]
 
 /* ── Balance / Scales SVG Logo ── */
@@ -89,8 +93,8 @@ function UserMenu({ advocate, logout }) {
           <div onClick={() => setOpen(false)} style={{ position: 'fixed', inset: 0, zIndex: 200 }} />
           <div style={{
             position: 'absolute', bottom: '100%', left: 0, right: 0, marginBottom: 6,
-            background: '#ffffff', border: '1px solid var(--border)', borderRadius: 12,
-            zIndex: 201, overflow: 'hidden', boxShadow: '0 -8px 24px rgba(0,0,0,0.08)'
+            background: 'var(--bg-primary)', border: '1px solid var(--border)', borderRadius: 12,
+            zIndex: 201, overflow: 'hidden', boxShadow: '0 -8px 24px rgba(0,0,0,0.12)'
           }}>
             <div style={{ padding: '14px 16px', borderBottom: '1px solid var(--border)' }}>
               <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-primary)' }}>{advocate.name}</div>
@@ -149,7 +153,7 @@ export default function Layout({ children }) {
       </div>
 
       <nav style={{ padding: '10px 10px', flex: 1, overflowY: 'auto' }}>
-        <div style={{ fontSize: 10, color: 'var(--text-muted)', letterSpacing: '0.1em', textTransform: 'uppercase', padding: '0 4px 6px', marginBottom: 4 }}>Navigation</div>
+        {/* <div style={{ fontSize: 10, color: 'var(--text-muted)', letterSpacing: '0.1em', textTransform: 'uppercase', padding: '0 4px 6px', marginBottom: 4 }}>Navigation</div> */}
         {NAV.map(({ to, icon: Icon, label, iconUrl }) => (
           <NavLink key={to} to={to} end={to==='/'} onClick={() => setOpen(false)}
             className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
@@ -183,7 +187,7 @@ export default function Layout({ children }) {
           <div style={{ display: 'flex', gap: 8 }}>
             <button onClick={() => navigate('/login')} style={{
               flex: 1, padding: '10px', borderRadius: 10,
-              border: '1px solid var(--border)', background: '#fff',
+              border: '1px solid var(--border)', background: 'var(--bg-card)',
               color: 'var(--text-secondary)', fontSize: 13, fontWeight: 500,
               cursor: 'pointer', display: 'flex', alignItems: 'center',
               justifyContent: 'center', gap: 6, transition: 'all 0.2s'
@@ -216,7 +220,7 @@ export default function Layout({ children }) {
       {/* Mobile Header */}
       <div style={{
         position: 'fixed', top: 0, left: 0, right: 0, height: 56,
-        background: '#ffffff', borderBottom: '1px solid var(--border)',
+        background: 'var(--sidebar-bg)', borderBottom: '1px solid var(--sidebar-border)',
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         padding: '0 16px', zIndex: 60
       }} className="mobile-header">
@@ -238,7 +242,7 @@ export default function Layout({ children }) {
       {/* Mobile Drawer */}
       <aside style={{
         position: 'fixed', top: 56, left: 0, bottom: 0, width: 250,
-        background: '#ffffff', borderRight: '1px solid var(--border)', zIndex: 56,
+        background: 'var(--sidebar-bg)', borderRight: '1px solid var(--sidebar-border)', zIndex: 56,
         transform: open ? 'translateX(0)' : 'translateX(-100%)',
         transition: 'transform 0.25s ease', display: 'flex', flexDirection: 'column'
       }} className="mobile-drawer">
@@ -252,7 +256,8 @@ export default function Layout({ children }) {
         minHeight: '100vh',
         maxWidth: 'calc(100vw - 250px)',
         boxSizing: 'border-box',
-        background: 'var(--bg-secondary)'
+        background: 'var(--bg-secondary)',
+        transition: 'background 0.25s ease',
       }} className="main-content">
         {children}
       </main>
