@@ -14,6 +14,10 @@ from routers import auth_router, history
 # NEW — RAG status router
 from routers.rag_status import router as rag_status_router
 
+# NEW — Master Drafter router (3-step AI flow)
+from routers.drafter import router as drafter_router
+
+
 app = FastAPI(
     title="LegalOne AI Drafting System",
     description="AI-powered legal drafting — RAG + Ollama + Auth + Case History",
@@ -48,7 +52,11 @@ app.include_router(auth_router.router,   prefix="/api", tags=["Authentication"])
 app.include_router(history.router,       prefix="/api", tags=["Case History"])
 
 # NEW — RAG status routes
-app.include_router(rag_status_router,    prefix="/api", tags=["RAG Status"])
+app.include_router(rag_status_router, prefix="/api", tags=["RAG Status"])
+
+# NEW — Master Drafter routes (3-step AI flow)
+app.include_router(drafter_router,    prefix="/api", tags=["AI Drafter"])
+
 
 
 @app.get("/")
