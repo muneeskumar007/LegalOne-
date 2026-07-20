@@ -1,0 +1,14 @@
+venv
+node_modules
+.git
+__pycache__
+*.pyc
+.env
+dist
+build
+.cache
+*.log
+models/
+datasets/
+uploads/
+faiss_index/
