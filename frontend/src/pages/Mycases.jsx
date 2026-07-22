@@ -464,7 +464,7 @@ export default function MyCasesPage() {
         }
       `}</style>
 
-      <div style={{ maxWidth: 1100, margin: '0 auto', padding: '28px 24px' }}>
+    <div style={{ maxWidth: 1600, margin: '0 auto', padding: '28px 32px', boxSizing: 'border-box' }}>
 
         {/* ── Header ── */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 28 }}>

@@ -11,6 +11,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from routers import extract, classify, draft, validate, compare, arguments, export
 from routers import auth_router, history
 
+
+ 
+
+
+
 # NEW — RAG status router
 from routers.rag_status import router as rag_status_router
 
@@ -27,7 +32,7 @@ app = FastAPI(
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "http://localhost:3000",
+        "http://localhost:3000", "http://localhost:3001", "http://localhost:3002", "http://localhost:3003",
         "http://localhost:5173",
         "http://localhost:4173"
     ],
@@ -57,6 +62,7 @@ app.include_router(rag_status_router, prefix="/api", tags=["RAG Status"])
 # NEW — Master Drafter routes (3-step AI flow)
 app.include_router(drafter_router,    prefix="/api", tags=["AI Drafter"])
 
+ 
 
 
 @app.get("/")
@@ -87,4 +93,4 @@ def health():
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
+    uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)

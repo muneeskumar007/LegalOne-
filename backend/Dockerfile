@@ -17,4 +17,5 @@ RUN python -c "from core.rag_pipeline import build_index; build_index()"
 
 EXPOSE 8000
 
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "1"]
+CMD ["uvicorn", "main:app", "--host", "127.0.0.1", "--port", "8000", "--workers", "1"]
+  
