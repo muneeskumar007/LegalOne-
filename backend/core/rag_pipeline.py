@@ -1,6 +1,20 @@
 """
-RAG Pipeline: Loads legal texts, creates embeddings with SentenceTransformers,
-stores in FAISS, and retrieves top-k relevant sections for LLM context.
+integration_rag_pipeline.py
+─────────────────────────────────────────────────────────────────
+REPLACEMENT for legalone/backend/core/rag_pipeline.py
+
+DROP THIS FILE INTO: legalone/backend/core/rag_pipeline.py
+
+What changed from original:
+  OLD → 20 hardcoded legal provisions in LEGAL_CORPUS list
+  NEW → Loads your real FAISS index built from 30+ judgment PDFs
+
+Auto-fallback chain:
+  1. Try real FAISS index  (your 30 PDF dataset)
+  2. Try built-in corpus   (original 20 hardcoded provisions)
+  3. Return empty          (system still runs, just weaker)
+
+So even if the dataset is not ready, LegalOne still works.
 """
 
 import os
@@ -10,167 +24,140 @@ import numpy as np
 from pathlib import Path
 from typing import List, Dict, Any, Optional
 
-# Lazy imports to avoid startup crashes if libraries are missing
+# ─── Lazy imports ────────────────────────────────────────────────────────────
 _sentence_transformer = None
-_faiss = None
-_index = None
-_documents: List[Dict] = []
+_faiss_module         = None
+_real_index           = None        # FAISS index from your dataset
+_real_documents       = []          # metadata from your dataset
+_builtin_index        = None        # fallback: original 20 provisions
+_builtin_documents    = []
 
-BASE_DIR = Path(__file__).parent.parent
-DATA_DIR = BASE_DIR / "data" / "bare_acts"
-INDEX_PATH = BASE_DIR / "data" / "faiss_index.pkl"
-DOCS_PATH = BASE_DIR / "data" / "documents.json"
+MODEL_NAME = "all-MiniLM-L6-v2"
 
-MODEL_NAME = "all-MiniLM-L6-v2"  # Lightweight, free, 80MB
+# ─── Path configuration ──────────────────────────────────────────────────────
+# This file lives at: legalone/backend/core/rag_pipeline.py
+# Dataset lives at:   legalone/dataset/faiss_index/
+BASE_DIR     = Path(__file__).parent.parent          # → legalone/backend/
+PROJECT_ROOT = BASE_DIR.parent                        # → legalone/
+
+DATASET_INDEX_PATH    = PROJECT_ROOT / "dataset" / "faiss_index" / "legal_rag"
+DATASET_METADATA_PATH = str(DATASET_INDEX_PATH) + "_metadata.pkl"
+DATASET_FAISS_PATH    = str(DATASET_INDEX_PATH) + ".faiss"
+
+# Legacy paths (built-in index from original system)
+BUILTIN_INDEX_PATH    = BASE_DIR / "data" / "faiss_index.pkl"
+BUILTIN_DOCS_PATH     = BASE_DIR / "data" / "documents.json"
 
 
-# ─── Built-in Legal Text Corpus ─────────────────────────────────────────────
-
+# ─── Built-in fallback corpus (original 20 provisions) ───────────────────────
+# Keep this so LegalOne works even without the dataset
 LEGAL_CORPUS: List[Dict[str, str]] = [
-    # Indian Contract Act
     {
-        "id": "ICA_10",
-        "act": "Indian Contract Act, 1872",
-        "section": "Section 10",
+        "id": "ICA_10", "act": "Indian Contract Act, 1872", "section": "Section 10",
         "title": "What agreements are contracts",
         "text": "All agreements are contracts if they are made by the free consent of parties competent to contract, for a lawful consideration and with a lawful object, and are not hereby expressly declared to be void."
     },
     {
-        "id": "ICA_37",
-        "act": "Indian Contract Act, 1872",
-        "section": "Section 37",
+        "id": "ICA_37", "act": "Indian Contract Act, 1872", "section": "Section 37",
         "title": "Obligation of parties to contracts",
         "text": "The parties to a contract must either perform, or offer to perform, their respective promises, unless such performance is dispensed with or excused under the provisions of this Act, or of any other law."
     },
     {
-        "id": "ICA_73",
-        "act": "Indian Contract Act, 1872",
-        "section": "Section 73",
-        "title": "Compensation for loss or damage caused by breach of contract",
-        "text": "When a contract has been broken, the party who suffers by such breach is entitled to receive, from the party who has broken it, compensation for any loss or damage caused to him thereby, which naturally arose in the usual course of things from such breach, or which the parties knew, when they made the contract, to be likely to result from the breach of it."
+        "id": "ICA_73", "act": "Indian Contract Act, 1872", "section": "Section 73",
+        "title": "Compensation for breach of contract",
+        "text": "When a contract has been broken, the party who suffers by such breach is entitled to receive compensation for any loss or damage caused to him thereby, which naturally arose in the usual course of things from such breach."
     },
-    # CPC
     {
-        "id": "CPC_9",
-        "act": "Code of Civil Procedure, 1908",
-        "section": "Section 9",
+        "id": "CPC_9", "act": "Code of Civil Procedure, 1908", "section": "Section 9",
         "title": "Courts to try all civil suits unless barred",
-        "text": "The Courts shall (subject to the provisions herein contained) have jurisdiction to try all suits of a civil nature excepting suits of which their cognizance is either expressly or impliedly barred. A suit is of a civil nature where the principal question therein relates to the determination of a civil right."
+        "text": "The Courts shall have jurisdiction to try all suits of a civil nature excepting suits of which their cognizance is either expressly or impliedly barred."
     },
     {
-        "id": "CPC_O7R1",
-        "act": "Code of Civil Procedure, 1908",
-        "section": "Order VII Rule 1",
+        "id": "CPC_O7R1", "act": "Code of Civil Procedure, 1908", "section": "Order VII Rule 1",
         "title": "Particulars to be contained in plaint",
-        "text": "Every plaint shall contain: the name of the Court in which the suit is brought; the name, description and place of residence of the plaintiff; the name, description and place of residence of the defendant; where the plaintiff or the defendant is a minor or a person of unsound mind, a statement to that effect; the facts constituting the cause of action and when it arose; the facts showing that the Court has jurisdiction; the relief which the plaintiff claims; where the plaintiff has allowed a set-off or relinquished a portion of his claim, the amount so allowed or relinquished; and a statement of the value of the subject-matter of the suit for the purposes of jurisdiction and of court fees."
+        "text": "Every plaint shall contain: the name of the Court; names and addresses of parties; facts constituting the cause of action; the relief claimed; valuation for court fees."
     },
     {
-        "id": "CPC_O37",
-        "act": "Code of Civil Procedure, 1908",
-        "section": "Order XXXVII",
-        "title": "Summary Suits",
-        "text": "Summary suits can be filed in cases relating to bills of exchange, hundies, promissory notes, or where the plaintiff seeks recovery of a debt or liquidated demand in money payable by defendant, with or without interest. The court may give leave to the defendant to defend the suit upon such terms as it thinks fit."
-    },
-    # Indian Evidence Act / BSA
-    {
-        "id": "IEA_101",
-        "act": "Indian Evidence Act, 1872",
-        "section": "Section 101",
+        "id": "IEA_101", "act": "Indian Evidence Act, 1872", "section": "Section 101",
         "title": "Burden of proof",
-        "text": "Whoever desires any Court to give judgment as to any legal right or liability dependent on the existence of facts which he asserts, must prove that those facts exist. When a person is bound to prove the existence of any fact, it is said that the burden of proof lies on that person."
+        "text": "Whoever desires any Court to give judgment as to any legal right or liability dependent on the existence of facts which he asserts, must prove that those facts exist."
     },
     {
-        "id": "IEA_102",
-        "act": "Indian Evidence Act, 1872",
-        "section": "Section 102",
+        "id": "IEA_102", "act": "Indian Evidence Act, 1872", "section": "Section 102",
         "title": "On whom burden of proof lies",
-        "text": "The burden of proof in a suit or proceeding lies on that person who would fail if no evidence at all were given on either side. In a money recovery suit, the plaintiff must first establish existence of debt; thereafter if defendant pleads repayment, burden shifts to defendant."
+        "text": "The burden of proof in a suit or proceeding lies on that person who would fail if no evidence at all were given on either side."
     },
     {
-        "id": "BSA_118",
-        "act": "Bharatiya Sakshya Adhiniyam, 2023",
-        "section": "Section 118",
-        "title": "Burden of proof - BSA equivalent",
-        "text": "The burden of proof as to any particular fact lies on that person who wishes the Court to believe in its existence, unless it is provided by any law that the proof of that fact shall lie on any particular person."
-    },
-    # NI Act
-    {
-        "id": "NIA_118",
-        "act": "Negotiable Instruments Act, 1881",
-        "section": "Section 118",
-        "title": "Presumptions as to negotiable instruments",
-        "text": "Until the contrary is proved, the following presumptions shall be made: (a) of consideration - that every negotiable instrument was made or drawn for consideration; (b) as to date - that every negotiable instrument bearing a date was made or drawn on such date; (c) as to time of acceptance - that every bill of exchange was accepted within a reasonable time after its date."
-    },
-    {
-        "id": "NIA_138",
-        "act": "Negotiable Instruments Act, 1881",
-        "section": "Section 138",
+        "id": "NIA_138", "act": "Negotiable Instruments Act, 1881", "section": "Section 138",
         "title": "Dishonour of cheque for insufficiency of funds",
-        "text": "Where any cheque drawn by a person on an account maintained by him with a banker for payment of any amount of money to another person from out of that account for the discharge, in whole or in part, of any debt or other liability, is returned by the bank unpaid, either because of the amount of money standing to the credit of that account is insufficient to honour the cheque or that it exceeds the arrangement made with that bank, such person shall be deemed to have committed an offence."
+        "text": "Where any cheque drawn by a person is returned by the bank unpaid due to insufficient funds, such person shall be deemed to have committed an offence punishable with imprisonment or fine or both."
     },
-    # Limitation Act
     {
-        "id": "LA_18",
-        "act": "Limitation Act, 1963",
-        "section": "Article 18",
+        "id": "NIA_139", "act": "Negotiable Instruments Act, 1881", "section": "Section 139",
+        "title": "Presumption in favour of holder",
+        "text": "It shall be presumed, unless the contrary is proved, that the holder of a cheque received the cheque for the discharge of any debt or liability."
+    },
+    {
+        "id": "HMA_13", "act": "Hindu Marriage Act, 1955", "section": "Section 13",
+        "title": "Divorce grounds",
+        "text": "Any marriage solemnised may, on a petition presented by either the husband or the wife, be dissolved by a decree of divorce on grounds including adultery, cruelty, desertion for two years, conversion, unsoundness of mind, leprosy, venereal disease, renunciation, and presumption of death."
+    },
+    {
+        "id": "HMA_13_1_IA", "act": "Hindu Marriage Act, 1955", "section": "Section 13(1)(ia)",
+        "title": "Divorce on ground of cruelty",
+        "text": "A divorce may be granted if the respondent has, after the solemnization of the marriage, treated the petitioner with cruelty. Cruelty includes both physical and mental cruelty. Mental cruelty is conduct which inflicts suffering upon the other party to such a degree that it becomes impossible to live together."
+    },
+    {
+        "id": "HMA_13B", "act": "Hindu Marriage Act, 1955", "section": "Section 13B",
+        "title": "Divorce by mutual consent",
+        "text": "Subject to the provisions of this Act, a petition for dissolution of marriage by a decree of divorce may be presented to the district court by both the parties to a marriage together, whether such marriage was solemnised before or after the commencement of the Marriage Laws (Amendment) Act, 1976, on the ground that they have been living separately for a period of one year or more, that they have not been able to live together and that they have mutually agreed that the marriage should be dissolved."
+    },
+    {
+        "id": "HSA_6", "act": "Hindu Succession Act, 1956", "section": "Section 6",
+        "title": "Devolution of interest in coparcenary property",
+        "text": "On and from the commencement of the Hindu Succession (Amendment) Act, 2005, in a Joint Hindu family governed by the Mitakshara law, the daughter of a coparcener shall by birth become a coparcener in her own right the same manner as the son."
+    },
+    {
+        "id": "HSA_15", "act": "Hindu Succession Act, 1956", "section": "Section 15",
+        "title": "General rules of succession in case of females",
+        "text": "The property of a female Hindu dying intestate shall devolve firstly upon the sons and daughters and the husband; secondly upon the heirs of the husband; thirdly upon the mother and father; fourthly upon the heirs of the father; and lastly upon the heirs of the mother."
+    },
+    {
+        "id": "LA_18", "act": "Limitation Act, 1963", "section": "Article 18",
         "title": "Suit on money lent",
         "text": "For a suit on money lent under an agreement that it shall be payable on demand: three years from the date when the loan is made."
     },
     {
-        "id": "LA_55",
-        "act": "Limitation Act, 1963",
-        "section": "Article 55",
-        "title": "Suit for compensation for breach of contract",
-        "text": "For a suit for compensation for breach of any contract, express or implied, not in writing, registered: three years when the contract is broken, or where there are successive breaches, when the breach in respect of which the suit is instituted occurs, or where the breach is continuing, when it ceases."
-    },
-    # Specific Relief Act
-    {
-        "id": "SRA_34",
-        "act": "Specific Relief Act, 1963",
-        "section": "Section 34",
-        "title": "Discretion of court as to declaration of status or right",
-        "text": "Any person entitled to any legal character, or to any right as to any property, may institute a suit against any person denying, or interested to deny, his title to such character or right, and the court may in its discretion make therein a declaration that he is so entitled, and the plaintiff need not in such suit ask for any further relief."
-    },
-    {
-        "id": "SRA_38",
-        "act": "Specific Relief Act, 1963",
-        "section": "Section 38",
+        "id": "SRA_38", "act": "Specific Relief Act, 1963", "section": "Section 38",
         "title": "Perpetual injunction when granted",
-        "text": "Subject to the other provisions contained in or referred to by this Chapter, a perpetual injunction may be granted to the plaintiff to prevent the breach of an obligation existing in his favour, whether expressly or by implication. When the defendant invades or threatens to invade the plaintiff's right to, or enjoyment of, property, the court may grant a perpetual injunction in the following cases, namely: where the defendant is trustee of the property for the plaintiff; where there exists no standard for ascertaining the actual damage caused or likely to be caused by the invasion; where the invasion is such that compensation in money would not afford adequate relief; where the injunction is necessary to prevent a multiplicity of judicial proceedings."
+        "text": "A perpetual injunction may be granted to prevent the breach of an obligation existing in the plaintiff's favour, whether expressly or by implication. When the defendant invades or threatens to invade the plaintiff's right to property, the court may grant a perpetual injunction."
     },
-    # BNS
     {
-        "id": "BNS_85",
-        "act": "Bharatiya Nyaya Sanhita, 2023",
-        "section": "Section 85",
-        "title": "Husband or relative of husband of a woman subjecting her to cruelty",
-        "text": "Whoever, being the husband or the relative of the husband of a woman, subjects such woman to cruelty shall be punished with imprisonment of either description for a term which may extend to three years and shall also be liable to fine. For the purposes of this section, cruelty means any wilful conduct which is of such a nature as is likely to drive the woman to commit suicide or to cause grave injury or danger to life, limb or health whether mental or physical of the woman; or harassment of the woman where such harassment is with a view to coercing her or any person related to her to meet any unlawful demand for any property or valuable security or is on account of failure by her or any person related to her to meet such demand."
+        "id": "CrPC_125", "act": "Code of Criminal Procedure, 1973", "section": "Section 125",
+        "title": "Maintenance of wives, children and parents",
+        "text": "If any person having sufficient means neglects or refuses to maintain his wife, his legitimate or illegitimate minor child, or his legitimate or illegitimate child (not being a married daughter) who has attained majority, where such child is unable to maintain itself, a Magistrate may order such person to make a monthly allowance for the maintenance of such wife or child."
     },
-    # Consumer Protection
     {
-        "id": "CPA_35",
-        "act": "Consumer Protection Act, 2019",
-        "section": "Section 35",
-        "title": "Manner in which complaint shall be made",
-        "text": "A complaint, in relation to any goods sold or delivered or agreed to be sold or delivered or any service provided or agreed to be provided, may be filed with a District Commission by the consumer to whom such goods are sold or delivered or agreed to be sold or delivered or such service provided or agreed to be provided; any recognised consumer association whether the consumer to whom the goods sold or delivered or agreed to be sold or delivered or service provided or agreed to be provided is a member of such association or not."
+        "id": "IEA_65B", "act": "Indian Evidence Act, 1872", "section": "Section 65B",
+        "title": "Admissibility of electronic records",
+        "text": "Any information contained in an electronic record which is printed on paper, or stored, recorded or copied in optical or magnetic media produced by a computer shall be deemed to be also a document and shall be admissible in any proceedings without further proof of the original, if the conditions set out in this section are satisfied."
     },
-    # Supreme Court Judgement references
     {
-        "id": "SC_BASALINGAPPA",
-        "act": "Supreme Court Judgement",
-        "section": "Basalingappa v. Mudibasappa (2019) 5 SCC 418",
+        "id": "SC_MENTAL_CRUELTY", "act": "Supreme Court Judgement", "section": "Samar Ghosh v. Jaya Ghosh (2007) 4 SCC 511",
+        "title": "Mental cruelty — guiding principles",
+        "text": "The Supreme Court laid down that no uniform standard can be laid down for mental cruelty. It depends on the social status, educational level of the parties, the society they move in, and their way of life. Sustained conduct which causes mental pain or suffering to the other spouse to such an extent that it makes it impossible to live with the other spouse constitutes mental cruelty."
+    },
+    {
+        "id": "SC_BASALINGAPPA", "act": "Supreme Court Judgement", "section": "Basalingappa v. Mudibasappa (2019) 5 SCC 418",
         "title": "Rebuttal of presumption under NI Act",
-        "text": "The Supreme Court held that the presumption under Section 118 and 139 of the Negotiable Instruments Act is a rebuttable presumption. The accused can rebut the presumption by raising a probable defence, not proof beyond reasonable doubt. The standard is preponderance of probabilities. If the accused raises a plausible defence that creates doubt, the presumption stands rebutted."
+        "text": "The presumption under Sections 118 and 139 of the NI Act is rebuttable. The accused can rebut the presumption on the standard of preponderance of probabilities. If the accused raises a plausible defence that creates doubt, the presumption stands rebutted."
     },
-    {
-        "id": "SC_MONEY_RECOVERY",
-        "act": "Legal Principle",
-        "section": "Money Recovery - Burden of Proof",
-        "title": "Burden of proof in money recovery suits",
-        "text": "In a suit for recovery of money, the plaintiff must establish the existence of debt and the defendant's liability. Once the plaintiff establishes a prima facie case through documentary evidence like bank statements, promissory notes, or receipts, the burden shifts to the defendant to prove payment or discharge. A mere statement of repayment without corroborative documentary evidence is insufficient. Bank withdrawal statement alone does not prove payment to plaintiff."
-    }
 ]
 
+
+# ═══════════════════════════════════════════════════════════════
+# ENCODER
+# ═══════════════════════════════════════════════════════════════
 
 def _get_encoder():
     global _sentence_transformer
@@ -178,90 +165,213 @@ def _get_encoder():
         try:
             from sentence_transformers import SentenceTransformer
             _sentence_transformer = SentenceTransformer(MODEL_NAME)
+            print(f"[RAG] Encoder loaded: {MODEL_NAME}")
         except ImportError:
-            raise RuntimeError("sentence-transformers not installed. Run: pip install sentence-transformers")
+            raise RuntimeError("Run: pip install sentence-transformers")
     return _sentence_transformer
 
 
 def _get_faiss():
-    global _faiss
-    if _faiss is None:
+    global _faiss_module
+    if _faiss_module is None:
         try:
             import faiss
-            _faiss = faiss
+            _faiss_module = faiss
         except ImportError:
-            raise RuntimeError("faiss-cpu not installed. Run: pip install faiss-cpu")
-    return _faiss
+            raise RuntimeError("Run: pip install faiss-cpu")
+    return _faiss_module
 
 
-def build_index() -> None:
-    """Build FAISS index from the legal corpus and persist to disk."""
-    global _index, _documents
-    faiss = _get_faiss()
+# ═══════════════════════════════════════════════════════════════
+# LOAD REAL DATASET INDEX (from your 30 PDF pipeline)
+# ═══════════════════════════════════════════════════════════════
+
+def _load_real_index() -> bool:
+    """
+    Try to load the FAISS index built from your judgment PDFs.
+    Returns True if successful, False if not available.
+    """
+    global _real_index, _real_documents
+
+    if not Path(DATASET_FAISS_PATH).exists():
+        return False
+    if not Path(DATASET_METADATA_PATH).exists():
+        return False
+
+    try:
+        faiss = _get_faiss()
+        _real_index = faiss.read_index(DATASET_FAISS_PATH)
+
+        with open(DATASET_METADATA_PATH, "rb") as f:
+            _real_documents = pickle.load(f)
+
+        print(f"[RAG] ✓ Real dataset loaded: {_real_index.ntotal} principles "
+              f"from {DATASET_FAISS_PATH}")
+        return True
+
+    except Exception as e:
+        print(f"[RAG] Could not load real index: {e}")
+        return False
+
+
+def _load_builtin_index():
+    """Build or load the fallback built-in 20-provision index."""
+    global _builtin_index, _builtin_documents
+
+    faiss   = _get_faiss()
     encoder = _get_encoder()
 
-    _documents = LEGAL_CORPUS
-    texts = [f"{doc['act']} {doc['section']} {doc['title']} {doc['text']}" for doc in _documents]
+    # Check for cached built-in index
+    if BUILTIN_INDEX_PATH.exists() and BUILTIN_DOCS_PATH.exists():
+        try:
+            with open(BUILTIN_INDEX_PATH, "rb") as f:
+                data = pickle.load(f)
+            _builtin_index = faiss.deserialize_index(data["index_bytes"])
+            with open(BUILTIN_DOCS_PATH) as f:
+                _builtin_documents = json.load(f)
+            print(f"[RAG] Built-in index loaded: {len(_builtin_documents)} provisions")
+            return
+        except:
+            pass
+
+    # Build fresh from LEGAL_CORPUS
+    _builtin_documents = LEGAL_CORPUS
+    texts = [
+        f"{doc['act']} {doc['section']} {doc['title']} {doc['text']}"
+        for doc in _builtin_documents
+    ]
     embeddings = encoder.encode(texts, show_progress_bar=False)
     embeddings = np.array(embeddings, dtype=np.float32)
 
     dim = embeddings.shape[1]
-    _index = faiss.IndexFlatL2(dim)
-    _index.add(embeddings)
+    _builtin_index = faiss.IndexFlatL2(dim)
+    _builtin_index.add(embeddings)
 
-    # Persist
-    os.makedirs(str(DATA_DIR.parent), exist_ok=True)
-    with open(INDEX_PATH, "wb") as f:
-        pickle.dump({"index_bytes": faiss.serialize_index(_index), "dim": dim}, f)
-    with open(DOCS_PATH, "w") as f:
-        json.dump(_documents, f, indent=2)
+    # Cache it
+    os.makedirs(str(BUILTIN_INDEX_PATH.parent), exist_ok=True)
+    with open(BUILTIN_INDEX_PATH, "wb") as f:
+        pickle.dump({"index_bytes": faiss.serialize_index(_builtin_index), "dim": dim}, f)
+    with open(BUILTIN_DOCS_PATH, "w") as f:
+        json.dump(_builtin_documents, f, indent=2)
 
-    print(f"[RAG] Index built with {len(_documents)} documents.")
+    print(f"[RAG] Built-in index built: {len(_builtin_documents)} provisions")
 
 
-def load_index() -> None:
-    """Load persisted FAISS index or build fresh."""
-    global _index, _documents
-    faiss = _get_faiss()
+# ═══════════════════════════════════════════════════════════════
+# PUBLIC API
+# ═══════════════════════════════════════════════════════════════
 
-    if INDEX_PATH.exists() and DOCS_PATH.exists():
-        with open(INDEX_PATH, "rb") as f:
-            data = pickle.load(f)
-        _index = faiss.deserialize_index(data["index_bytes"])
-        with open(DOCS_PATH) as f:
-            _documents = json.load(f)
-        print(f"[RAG] Loaded index with {len(_documents)} documents.")
-    else:
-        build_index()
+def load_index():
+    """
+    Load the best available index.
+    Priority: real dataset > built-in fallback.
+    Called automatically on first retrieve().
+    """
+    real_loaded = _load_real_index()
+    if not real_loaded:
+        print("[RAG] Real dataset not found — using built-in corpus")
+        _load_builtin_index()
+    return real_loaded
 
 
 def retrieve(query: str, top_k: int = 5) -> List[Dict[str, Any]]:
-    """Retrieve top-k relevant legal sections for a query."""
-    global _index, _documents
-
-    if _index is None:
+    """
+    Main retrieval function.
+    Returns top-k most relevant legal provisions/principles for a query.
+    """
+    # Auto-load on first call
+    if _real_index is None and _builtin_index is None:
         load_index()
 
-    encoder = _get_encoder()
-    query_vec = encoder.encode([query], show_progress_bar=False)
-    query_vec = np.array(query_vec, dtype=np.float32)
+    encoder   = _get_encoder()
+    query_vec = np.array(encoder.encode([query], show_progress_bar=False), dtype=np.float32)
 
-    distances, indices = _index.search(query_vec, top_k)
+    # Use real dataset if available, else built-in
+    if _real_index is not None:
+        index     = _real_index
+        documents = _real_documents
+        source    = "real_dataset"
+    else:
+        index     = _builtin_index
+        documents = _builtin_documents
+        source    = "builtin"
+
+    distances, indices = index.search(query_vec, min(top_k, index.ntotal))
+
     results = []
     for dist, idx in zip(distances[0], indices[0]):
-        if idx < len(_documents):
-            doc = dict(_documents[idx])
-            doc["score"] = float(1 / (1 + dist))  # normalize to 0-1
+        if idx < len(documents):
+            doc = dict(documents[idx])
+            doc["score"]  = float(round(1 / (1 + dist), 4))
+            doc["source"] = source
+            # Normalise field names between real dataset and built-in
+            if "principle" in doc and "text" not in doc:
+                doc["text"] = doc.get("held", doc.get("principle", ""))
+            if "act" not in doc and "domain" in doc:
+                doc["act"] = doc.get("domain", "")
+            if "section" not in doc:
+                doc["section"] = doc.get("principle_id", "")
             results.append(doc)
 
     return sorted(results, key=lambda x: x["score"], reverse=True)
 
 
-def get_context_for_prompt(query: str, top_k: int = 4) -> str:
-    """Return formatted legal context string for LLM prompt injection."""
+def get_context_for_prompt(query: str, top_k: int = 5) -> str:
+    """
+    Returns formatted legal context string for LLM prompt injection.
+    Used by draft_generator.py and argument_writer.py.
+    """
     results = retrieve(query, top_k=top_k)
-    lines = ["[RELEVANT LEGAL PROVISIONS]\n"]
+    if not results:
+        return "[No relevant legal provisions found]"
+
+    lines = ["[RELEVANT LEGAL PROVISIONS FROM DATASET]\n"]
     for r in results:
-        lines.append(f"• {r['act']} – {r['section']}: {r['title']}")
-        lines.append(f"  {r['text'][:300]}...\n" if len(r['text']) > 300 else f"  {r['text']}\n")
+        act     = r.get("act", r.get("domain", ""))
+        section = r.get("section", r.get("principle_id", ""))
+        title   = r.get("title", r.get("principle", ""))[:80]
+        text    = r.get("text", r.get("held", ""))[:300]
+
+        lines.append(f"• {act} — {section}: {title}")
+        lines.append(f"  {text}{'...' if len(text)==300 else ''}\n")
+
     return "\n".join(lines)
+
+
+def get_index_info() -> dict:
+    """Returns info about the currently loaded index."""
+    info = {
+        "real_dataset_available": Path(DATASET_FAISS_PATH).exists(),
+        "real_dataset_path":      DATASET_FAISS_PATH,
+        "builtin_corpus_size":    len(LEGAL_CORPUS),
+        "model":                  MODEL_NAME,
+    }
+    if _real_index is not None:
+        info["active_index"]    = "real_dataset"
+        info["active_size"]     = _real_index.ntotal
+    elif _builtin_index is not None:
+        info["active_index"]    = "builtin"
+        info["active_size"]     = len(_builtin_documents)
+    else:
+        info["active_index"]    = "not_loaded"
+        info["active_size"]     = 0
+    return info
+
+
+def rebuild_index():
+    """Force rebuild of the built-in index (clears cache)."""
+    global _builtin_index, _builtin_documents
+    _builtin_index     = None
+    _builtin_documents = []
+    if BUILTIN_INDEX_PATH.exists():
+        BUILTIN_INDEX_PATH.unlink()
+    _load_builtin_index()
+
+
+# ═══════════════════════════════════════════════════════════════
+# STARTUP — try to load real index immediately
+# ═══════════════════════════════════════════════════════════════
+try:
+    load_index()
+except Exception as e:
+    print(f"[RAG] Startup load skipped: {e}")

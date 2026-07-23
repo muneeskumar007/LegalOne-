@@ -2,14 +2,17 @@ import { Routes, Route } from 'react-router-dom'
 import Layout        from './components/Layout'
 import Dashboard     from './pages/Dashboard'
 import DraftPage     from './pages/DraftPage'
-import ValidatePage  from './pages/ValidatePage'
-import ComparePage   from './pages/ComparePage'
-import PipelinePage  from './pages/PipelinePage'
+
+ 
 import ReferencePage from './pages/ReferencePage'
-import ArgumentPage  from './pages/ArgumentPage'
+
 import LoginPage     from './pages/LoginPage'
 import SignupPage    from './pages/SignupPage'
 import ProfilePage   from './pages/ProfilePage'
+import JudgementsDashboard from './pages/JudgementsDashboard'
+import MyCasesPage   from './pages/Mycases'
+import RagStatusPage from './pages/RagStatusPage'
+
 
 export default function App() {
   return (
@@ -23,12 +26,16 @@ export default function App() {
         <Layout>
           <Routes>
             <Route path="/"          element={<Dashboard />}    />
-            <Route path="/pipeline"  element={<PipelinePage />} />
+           
             <Route path="/draft"     element={<DraftPage />}    />
-            <Route path="/arguments" element={<ArgumentPage />} />
-            <Route path="/validate"  element={<ValidatePage />} />
-            <Route path="/compare"   element={<ComparePage />}  />
+            
             <Route path="/reference" element={<ReferencePage />}/>
+            <Route path="/my-cases"  element={<MyCasesPage />} />
+            <Route path="/judgements"  element={<JudgementsDashboard />} />
+
+
+<Route path="/rag" element={<RagStatusPage />} />
+
             <Route path="/profile"   element={<ProfilePage />}  />
           </Routes>
         </Layout>

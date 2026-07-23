@@ -72,7 +72,7 @@ def test_rule_engine():
 def test_rag_pipeline():
     print("\n── RAG Pipeline ─────────────────────────────────────────")
     try:
-        from core.rag_pipeline import build_index, retrieve
+        from backend.core.rag_pipeline import build_index, retrieve
         print(f"  … Building index (first run downloads ~80 MB model)…")
         build_index()
         results = retrieve("money recovery suit promissory note", top_k=3)

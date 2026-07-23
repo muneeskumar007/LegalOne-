@@ -1,22 +1,26 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
-import { User, Lock, Trash2, Star, FileText, GitBranch, Scale, CheckCircle, GitCompare, Save, AlertCircle, CheckCircle2 } from 'lucide-react'
+import { User, Lock, Trash2, Star, FileText, GitBranch, Scale, CheckCircle, GitCompare, Save, AlertCircle, CheckCircle2, Camera } from 'lucide-react'
 
 const MODULE_META = {
-  pipeline:  { icon: GitBranch,    label:'AI Pipeline',  color:'var(--gold)'    },
-  draft:     { icon: FileText,     label:'Drafts',       color:'var(--info)'    },
-  arguments: { icon: Scale,        label:'Arguments',    color:'var(--warning)' },
-  validate:  { icon: CheckCircle,  label:'Validations',  color:'var(--success)' },
-  compare:   { icon: GitCompare,   label:'Comparisons',  color:'var(--error)'   },
+  pipeline:  { icon: GitBranch,    label:'AI Pipeline',  color:'var(--text-primary)' },
+  draft:     { icon: FileText,     label:'Drafts',       color:'var(--info)'         },
+  arguments: { icon: Scale,        label:'Arguments',    color:'var(--warning)'      },
+  validate:  { icon: CheckCircle,  label:'Validations',  color:'var(--success)'      },
+  compare:   { icon: GitCompare,   label:'Comparisons',  color:'var(--error)'        },
 }
 
 function StatCard({ icon: Icon, label, value, color }) {
   return (
-    <div style={{ padding:'16px 18px', background:'var(--bg-card)', borderRadius:10, border:'1px solid var(--border)', textAlign:'center' }}>
+    <div style={{
+      padding:'18px 20px', background:'#ffffff', borderRadius:12,
+      border:'1px solid var(--border)', textAlign:'center',
+      transition: 'all 0.2s'
+    }}>
       <Icon size={18} color={color} style={{ margin:'0 auto 8px' }} />
       <div style={{ fontFamily:'Playfair Display,serif', fontSize:28, fontWeight:700, color, lineHeight:1 }}>{value}</div>
-      <div style={{ fontSize:11, color:'var(--text-muted)', marginTop:4, textTransform:'uppercase', letterSpacing:'0.05em' }}>{label}</div>
+      <div style={{ fontSize:11, color:'var(--text-muted)', marginTop:6, textTransform:'uppercase', letterSpacing:'0.06em', fontWeight:500 }}>{label}</div>
     </div>
   )
 }
@@ -73,133 +77,225 @@ export default function ProfilePage() {
   const totalCases = stats?.total || 0
 
   const TABS = [
-    { id:'profile',  label:'Profile'  },
-    { id:'security', label:'Security' },
-    { id:'stats',    label:'Stats'    },
+    { id:'profile',  label:'Profile',  icon: User },
+    { id:'security', label:'Security', icon: Lock },
+    { id:'stats',    label:'Stats',    icon: FileText },
   ]
 
   return (
-    <div style={{ maxWidth:700 }}>
+    <div style={{ maxWidth:720 }}>
+      {/* ── Page Header ── */}
       <div className="animate-fade-up" style={{ marginBottom:28 }}>
-        <h2 style={{ fontFamily:'Playfair Display,serif', fontSize:24, fontWeight:700, marginBottom:6 }}>
-          <User size={22} style={{ display:'inline', marginRight:10, color:'var(--gold)' }} />
-          Advocate Profile
-        </h2>
-        <p style={{ color:'var(--text-muted)', fontSize:13 }}>Manage your account, security, and view activity stats</p>
+        <h1 style={{
+          fontFamily:'Playfair Display,serif', fontSize:28, fontWeight:700,
+          color:'var(--text-primary)', marginBottom:6
+        }}>
+          Settings
+        </h1>
+        <p style={{ color:'var(--text-muted)', fontSize:14 }}>Manage your profile, security, and preferences</p>
       </div>
 
-      {/* Profile header card */}
-      <div className="glass-card" style={{ padding:'20px 22px', marginBottom:20, display:'flex', alignItems:'center', gap:18 }}>
-        <div style={{ width:64, height:64, borderRadius:'50%', background:'linear-gradient(135deg,var(--gold),var(--gold-dim))', display:'flex', alignItems:'center', justifyContent:'center', fontSize:22, fontWeight:700, color:'#0f0d0a', flexShrink:0 }}>
-          {initials}
-        </div>
-        <div style={{ flex:1 }}>
-          <div style={{ fontFamily:'Playfair Display,serif', fontSize:20, fontWeight:600 }}>{advocate?.name}</div>
-          <div style={{ fontSize:13, color:'var(--text-muted)', marginTop:2 }}>{advocate?.email}</div>
-          <div style={{ display:'flex', gap:8, marginTop:6, flexWrap:'wrap' }}>
-            {advocate?.bar_number && <span className="badge badge-gold" style={{ fontSize:10 }}>{advocate.bar_number}</span>}
-            {advocate?.court      && <span className="badge badge-info"  style={{ fontSize:10 }}>{advocate.court}</span>}
-            {totalCases > 0       && <span className="badge badge-success" style={{ fontSize:10 }}>{totalCases} cases saved</span>}
-          </div>
-        </div>
-        <button onClick={() => { logout(); navigate('/') }} style={{ display:'flex', alignItems:'center', gap:6, padding:'7px 14px', border:'1px solid rgba(248,113,113,0.3)', background:'rgba(248,113,113,0.08)', color:'var(--error)', borderRadius:7, fontSize:13, cursor:'pointer' }}>
-          Sign Out
-        </button>
-      </div>
-
-      {/* Tab bar */}
-      <div style={{ display:'flex', gap:4, marginBottom:20, background:'var(--bg-card)', padding:4, borderRadius:10, border:'1px solid var(--border)' }}>
-        {TABS.map(t => (
-          <button key={t.id} onClick={() => setTab(t.id)} style={{ flex:1, padding:'8px', border:'none', borderRadius:7, fontSize:13, fontWeight:500, cursor:'pointer', background:tab===t.id?'var(--gold)':'transparent', color:tab===t.id?'#0f0d0a':'var(--text-secondary)', transition:'all 0.2s' }}>
-            {t.label}
-          </button>
-        ))}
-      </div>
-
-      {/* Feedback messages */}
-      {msg && <div style={{ display:'flex', gap:8, padding:'10px 14px', background:'rgba(74,222,128,0.1)', border:'1px solid rgba(74,222,128,0.2)', borderRadius:8, color:'var(--success)', fontSize:13, marginBottom:16 }}><CheckCircle2 size={15} style={{ flexShrink:0, marginTop:1 }} />{msg}</div>}
-      {err && <div style={{ display:'flex', gap:8, padding:'10px 14px', background:'rgba(248,113,113,0.1)', border:'1px solid rgba(248,113,113,0.2)', borderRadius:8, color:'var(--error)', fontSize:13, marginBottom:16 }}><AlertCircle size={15} style={{ flexShrink:0, marginTop:1 }} />{err}</div>}
-
-      {/* PROFILE TAB */}
-      {tab === 'profile' && (
-        <div className="glass-card" style={{ padding:'24px 22px' }}>
-          <form onSubmit={saveProfile}>
-            <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:14, marginBottom:14 }}>
-              {[['Full Name','name','Adv. Ravi Kumar'],['Bar Council No.','bar_number','TN/1234/2020'],['Court / District','court','Krishnagiri District'],['Phone','phone','+91 99521 20941']].map(([lbl,key,ph]) => (
-                <div key={key}>
-                  <label style={{ fontSize:11, color:'var(--text-muted)', display:'block', marginBottom:5, textTransform:'uppercase', letterSpacing:'0.05em' }}>{lbl}</label>
-                  <input className="legal-input" style={{ fontSize:14 }} value={form[key]} onChange={set(key)} placeholder={ph} />
-                </div>
-              ))}
-            </div>
-            <div style={{ marginBottom:14 }}>
-              <label style={{ fontSize:11, color:'var(--text-muted)', display:'block', marginBottom:5, textTransform:'uppercase', letterSpacing:'0.05em' }}>Email (cannot be changed)</label>
-              <input className="legal-input" style={{ fontSize:14, opacity:0.5, cursor:'not-allowed' }} value={advocate?.email||''} disabled />
-            </div>
-            <button type="submit" className="btn-gold" disabled={saving} style={{ padding:'11px 28px', borderRadius:8, fontSize:14, display:'flex', alignItems:'center', gap:7 }}>
-              <Save size={14} /> {saving ? 'Saving…' : 'Save Profile'}
+      {/* ── Tab Bar ── */}
+      <div style={{
+        display:'flex', gap:0, marginBottom:24,
+        borderBottom: '2px solid var(--border)'
+      }}>
+        {TABS.map(t => {
+          const isActive = tab === t.id
+          return (
+            <button key={t.id} onClick={() => setTab(t.id)} style={{
+              padding:'12px 20px',
+              border:'none', background:'transparent',
+              fontSize:14, fontWeight: isActive ? 600 : 500,
+              cursor:'pointer',
+              color: isActive ? 'var(--text-primary)' : 'var(--text-muted)',
+              borderBottom: isActive ? '2px solid var(--text-primary)' : '2px solid transparent',
+              marginBottom: '-2px',
+              transition:'all 0.2s',
+              display:'flex', alignItems:'center', gap:8
+            }}>
+              <t.icon size={15} strokeWidth={isActive ? 2 : 1.5} />
+              {t.label}
             </button>
-          </form>
+          )
+        })}
+      </div>
+
+      {/* ── Feedback messages ── */}
+      {msg && (
+        <div style={{
+          display:'flex', gap:8, padding:'12px 16px',
+          background:'rgba(34,197,94,0.06)', border:'1px solid rgba(34,197,94,0.15)',
+          borderRadius:10, color:'var(--success)', fontSize:13, marginBottom:16,
+          alignItems:'center'
+        }}>
+          <CheckCircle2 size={15} style={{ flexShrink:0 }} />{msg}
+        </div>
+      )}
+      {err && (
+        <div style={{
+          display:'flex', gap:8, padding:'12px 16px',
+          background:'rgba(239,68,68,0.06)', border:'1px solid rgba(239,68,68,0.15)',
+          borderRadius:10, color:'var(--error)', fontSize:13, marginBottom:16,
+          alignItems:'center'
+        }}>
+          <AlertCircle size={15} style={{ flexShrink:0 }} />{err}
         </div>
       )}
 
-      {/* SECURITY TAB */}
-      {tab === 'security' && (
-        <div className="glass-card" style={{ padding:'24px 22px' }}>
-          <div style={{ fontFamily:'Playfair Display,serif', fontSize:17, fontWeight:600, marginBottom:18, display:'flex', alignItems:'center', gap:8 }}>
-            <Lock size={16} color="var(--gold)" /> Change Password
-          </div>
-          <form onSubmit={changePw}>
-            {[['Current Password','current_password'],['New Password','new_password'],['Confirm New Password','confirm']].map(([lbl,key]) => (
-              <div key={key} style={{ marginBottom:14 }}>
-                <label style={{ fontSize:11, color:'var(--text-muted)', display:'block', marginBottom:5, textTransform:'uppercase', letterSpacing:'0.05em' }}>{lbl}</label>
-                <input type="password" className="legal-input" style={{ fontSize:14 }} value={pwForm[key]} onChange={setPw(key)} placeholder="••••••••" />
-              </div>
-            ))}
-            <button type="submit" className="btn-gold" disabled={saving} style={{ padding:'11px 28px', borderRadius:8, fontSize:14 }}>
-              {saving ? 'Updating…' : 'Change Password'}
-            </button>
-          </form>
+      {/* ═══ PROFILE TAB ═══ */}
+      {tab === 'profile' && (
+        <div>
+          {/* Profile Info Card */}
+          <div className="glass-card" style={{ padding:'28px 24px', marginBottom:20 }}>
+            <div style={{ marginBottom:20 }}>
+              <h3 style={{ fontSize:18, fontWeight:600, color:'var(--text-primary)', marginBottom:4 }}>Profile Information</h3>
+              <p style={{ fontSize:13, color:'var(--text-muted)' }}>Update your personal details and contact info</p>
+            </div>
 
-          <div style={{ marginTop:32, paddingTop:24, borderTop:'1px solid var(--border)' }}>
-            <div style={{ fontFamily:'Playfair Display,serif', fontSize:17, fontWeight:600, marginBottom:8, color:'var(--error)', display:'flex', alignItems:'center', gap:8 }}>
+            {/* Avatar */}
+            <div style={{ display:'flex', alignItems:'center', gap:18, marginBottom:24 }}>
+              <div style={{ position:'relative' }}>
+                <div style={{
+                  width:72, height:72, borderRadius:'50%',
+                  background:'#e5e5e5',
+                  display:'flex', alignItems:'center', justifyContent:'center',
+                  fontSize:24, fontWeight:700, color:'#a3a3a3'
+                }}>
+                  <User size={30} color="#a3a3a3" />
+                </div>
+                <button style={{
+                  position:'absolute', bottom:0, right:0,
+                  width:24, height:24, borderRadius:'50%',
+                  background:'var(--text-primary)', border:'2px solid #fff',
+                  display:'flex', alignItems:'center', justifyContent:'center',
+                  cursor:'pointer'
+                }}>
+                  <Camera size={11} color="#fff" />
+                </button>
+              </div>
+              <div>
+                <div style={{ fontSize:16, fontWeight:600, color:'var(--text-primary)' }}>{advocate?.name}</div>
+                <div style={{ fontSize:13, color:'var(--text-muted)', marginTop:2 }}>{advocate?.email}</div>
+              </div>
+            </div>
+
+            {/* Form */}
+            <form onSubmit={saveProfile}>
+              <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:16, marginBottom:16 }}>
+                {[
+                  ['Phone Number','phone','+91 98765 43210'],
+                  ['Bar Council No.','bar_number','TN/1234/2020'],
+                  ['Chamber / Firm Name','court','Sharma & Associates'],
+                  ['Full Name','name','Adv. Ravi Kumar'],
+                ].map(([lbl,key,ph]) => (
+                  <div key={key}>
+                    <label style={{
+                      fontSize:12, color:'var(--text-muted)', display:'block',
+                      marginBottom:6, fontWeight:500
+                    }}>{lbl}</label>
+                    <input className="legal-input" style={{ fontSize:14, background:'#fff' }}
+                      value={form[key]} onChange={set(key)} placeholder={ph} />
+                  </div>
+                ))}
+              </div>
+              <div style={{ marginBottom:16 }}>
+                <label style={{
+                  fontSize:12, color:'var(--text-muted)', display:'block',
+                  marginBottom:6, fontWeight:500
+                }}>Email (cannot be changed)</label>
+                <input className="legal-input" style={{ fontSize:14, opacity:0.5, cursor:'not-allowed', background:'var(--bg-card)' }}
+                  value={advocate?.email||''} disabled />
+              </div>
+              <button type="submit" className="btn-gold" disabled={saving} style={{
+                padding:'11px 28px', borderRadius:10, fontSize:14,
+                display:'flex', alignItems:'center', gap:8
+              }}>
+                <Save size={14} /> {saving ? 'Saving…' : 'Save Changes'}
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ═══ SECURITY TAB ═══ */}
+      {tab === 'security' && (
+        <div>
+          {/* Change Password */}
+          <div className="glass-card" style={{ padding:'28px 24px', marginBottom:20 }}>
+            <div style={{ marginBottom:20 }}>
+              <h3 style={{ fontSize:18, fontWeight:600, color:'var(--text-primary)', marginBottom:4 }}>Change Password</h3>
+              <p style={{ fontSize:13, color:'var(--text-muted)' }}>Update your password to keep your account secure</p>
+            </div>
+            <form onSubmit={changePw}>
+              {[['Current Password','current_password'],['New Password','new_password'],['Confirm New Password','confirm']].map(([lbl,key]) => (
+                <div key={key} style={{ marginBottom:16 }}>
+                  <label style={{
+                    fontSize:12, color:'var(--text-muted)', display:'block',
+                    marginBottom:6, fontWeight:500
+                  }}>{lbl}</label>
+                  <input type="password" className="legal-input" style={{ fontSize:14, background:'#fff' }}
+                    value={pwForm[key]} onChange={setPw(key)} placeholder={`Enter ${lbl.toLowerCase()}`} />
+                </div>
+              ))}
+              <button type="submit" className="btn-gold" disabled={saving} style={{
+                padding:'11px 28px', borderRadius:10, fontSize:14
+              }}>
+                {saving ? 'Updating…' : 'Update Password'}
+              </button>
+            </form>
+          </div>
+
+          {/* Danger Zone */}
+          <div className="glass-card" style={{ padding:'24px', border:'1px solid rgba(239,68,68,0.2)' }}>
+            <div style={{ fontSize:16, fontWeight:600, marginBottom:8, color:'var(--error)', display:'flex', alignItems:'center', gap:8 }}>
               <Trash2 size={16} /> Danger Zone
             </div>
-            <p style={{ fontSize:13, color:'var(--text-muted)', marginBottom:12 }}>Deactivating your account will remove access. Your case history will be preserved for 30 days.</p>
-            <button onClick={() => { if (window.confirm('Are you sure you want to deactivate your account?')) { authApi.delete('/auth/account').then(() => { logout(); navigate('/') }) } }} style={{ padding:'9px 20px', border:'1px solid rgba(248,113,113,0.4)', background:'rgba(248,113,113,0.08)', color:'var(--error)', borderRadius:7, fontSize:13, cursor:'pointer' }}>
+            <p style={{ fontSize:13, color:'var(--text-muted)', marginBottom:14 }}>
+              Deactivating your account will remove access. Your case history will be preserved for 30 days.
+            </p>
+            <button onClick={() => {
+              if (window.confirm('Are you sure you want to deactivate your account?')) {
+                authApi.delete('/auth/account').then(() => { logout(); navigate('/') })
+              }
+            }} style={{
+              padding:'10px 20px', border:'1px solid rgba(239,68,68,0.3)',
+              background:'rgba(239,68,68,0.05)', color:'var(--error)',
+              borderRadius:10, fontSize:13, cursor:'pointer', fontWeight:500
+            }}>
               Deactivate Account
             </button>
           </div>
         </div>
       )}
 
-      {/* STATS TAB */}
+      {/* ═══ STATS TAB ═══ */}
       {tab === 'stats' && (
         <div>
           {stats ? (
             <>
-              <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill,minmax(140px,1fr))', gap:12, marginBottom:20 }}>
-                <StatCard icon={FileText}   label="Total Cases" value={stats.total}   color="var(--gold)"    />
-                <StatCard icon={Star}       label="Starred"     value={stats.starred} color="var(--warning)" />
+              <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill,minmax(140px,1fr))', gap:14, marginBottom:20 }}>
+                <StatCard icon={FileText} label="Total Cases" value={stats.total} color="var(--text-primary)" />
+                <StatCard icon={Star}     label="Starred"     value={stats.starred} color="var(--warning)" />
                 {Object.entries(stats.modules||{}).map(([mod,count]) => {
                   const meta = MODULE_META[mod] || { icon:FileText, label:mod, color:'var(--text-muted)' }
                   return <StatCard key={mod} icon={meta.icon} label={meta.label} value={count} color={meta.color} />
                 })}
               </div>
 
-              {/* Module breakdown bar */}
+              {/* Module breakdown */}
               {Object.keys(stats.modules||{}).length > 0 && (
-                <div className="glass-card" style={{ padding:18 }}>
-                  <div style={{ fontSize:11, color:'var(--text-muted)', textTransform:'uppercase', letterSpacing:'0.1em', marginBottom:14 }}>Usage Breakdown</div>
-                  <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
+                <div className="glass-card" style={{ padding:20 }}>
+                  <div style={{ fontSize:12, color:'var(--text-muted)', textTransform:'uppercase', letterSpacing:'0.1em', marginBottom:16, fontWeight:500 }}>Usage Breakdown</div>
+                  <div style={{ display:'flex', flexDirection:'column', gap:12 }}>
                     {Object.entries(stats.modules).sort(([,a],[,b]) => b-a).map(([mod,count]) => {
                       const meta  = MODULE_META[mod] || { label:mod, color:'var(--text-muted)' }
                       const pct   = stats.total > 0 ? Math.round(count/stats.total*100) : 0
                       return (
                         <div key={mod}>
-                          <div style={{ display:'flex', justifyContent:'space-between', marginBottom:4 }}>
-                            <span style={{ fontSize:13, color:'var(--text-secondary)' }}>{meta.label}</span>
-                            <span style={{ fontSize:13, color:meta.color, fontWeight:500 }}>{count} ({pct}%)</span>
+                          <div style={{ display:'flex', justifyContent:'space-between', marginBottom:5 }}>
+                            <span style={{ fontSize:13, color:'var(--text-secondary)', fontWeight:500 }}>{meta.label}</span>
+                            <span style={{ fontSize:13, color:meta.color, fontWeight:600 }}>{count} ({pct}%)</span>
                           </div>
                           <div className="progress-bar">
                             <div className="progress-fill" style={{ width:`${pct}%`, background:meta.color }} />
@@ -212,14 +308,14 @@ export default function ProfilePage() {
               )}
 
               {stats.total === 0 && (
-                <div style={{ textAlign:'center', padding:'40px 20px', color:'var(--text-muted)' }}>
-                  <FileText size={32} style={{ margin:'0 auto 12px', opacity:0.4 }} />
+                <div style={{ textAlign:'center', padding:'48px 20px', color:'var(--text-muted)' }}>
+                  <FileText size={36} style={{ margin:'0 auto 12px', opacity:0.3 }} />
                   <p>No cases saved yet. Use any tool and your results will appear here.</p>
                 </div>
               )}
             </>
           ) : (
-            <div style={{ display:'flex', gap:10 }}>{[1,2,3].map(i => <div key={i} className="skeleton" style={{ height:90, flex:1, borderRadius:10 }} />)}</div>
+            <div style={{ display:'flex', gap:12 }}>{[1,2,3].map(i => <div key={i} className="skeleton" style={{ height:100, flex:1, borderRadius:12 }} />)}</div>
           )}
         </div>
       )}

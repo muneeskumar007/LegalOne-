@@ -6,6 +6,12 @@ backend/*.pyc
 backend/.env
 backend/data/faiss_index.pkl
 backend/data/documents.json
+venv/
+
+venv/
+__pycache__/
+*.pyc
+.env
 
 # Node
 frontend/node_modules/

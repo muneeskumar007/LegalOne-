@@ -6,7 +6,7 @@ Falls back to rule-based template generation if Ollama is unavailable.
 import json
 import requests
 from typing import Dict, Any, Optional
-from core.rag_pipeline import get_context_for_prompt
+from  core.rag_pipeline import get_context_for_prompt
 
 OLLAMA_BASE_URL = "http://localhost:11434"
 OLLAMA_MODEL = "llama3"
@@ -178,7 +178,7 @@ def generate_draft(
         for a in rule_mapping.get("applicable_acts", [])[:3]
     ])
 
-    system_prompt = """You are an expert Indian legal drafter with 20+ years of experience in
+    system_prompt = """You are an expert Indian legal drafter with 20+ years of experience in hindu marriage act,
 civil and criminal litigation. You draft petitions strictly following Indian court formats,
 citing correct sections of IPC/BNS, CPC, Evidence Act, and other statutes.
 Always use formal legal language. Structure every petition with:

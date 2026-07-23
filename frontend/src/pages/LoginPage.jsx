@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
-import { Gavel, Eye, EyeOff, AlertCircle, Scale } from 'lucide-react'
+import { Scale, Eye, EyeOff, AlertCircle } from 'lucide-react'
 
 export default function LoginPage() {
   const { login, loading, error, clearError } = useAuth()
@@ -18,6 +18,9 @@ export default function LoginPage() {
     if (!email.trim() || !password) { setLocalErr('Please fill in all fields'); return }
     const res = await login(email.trim(), password)
     if (res.success) navigate('/')
+    else if (!res.message || res.message === 'Login failed') {
+      setLocalErr('Cannot reach server. Please ensure the backend is running.')
+    }
   }
 
   const displayErr = localErr || error
@@ -34,11 +37,11 @@ export default function LoginPage() {
         <div style={{ textAlign: 'center', marginBottom: 36 }}>
           <div style={{
             width: 56, height: 56, borderRadius: 14, margin: '0 auto 16px',
-            background: 'linear-gradient(135deg, var(--gold), var(--gold-dim))',
+            background: '#111',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            boxShadow: '0 0 40px rgba(212,168,67,0.3)'
+            boxShadow: '0 4px 24px rgba(0,0,0,0.18)'
           }}>
-            <Gavel size={28} color="#0f0d0a" strokeWidth={2} />
+            <Scale size={28} color="#fff" strokeWidth={1.8} />
           </div>
           <h1 style={{ fontFamily: 'Playfair Display,serif', fontSize: 26, fontWeight: 700, marginBottom: 4 }}>
             Legal<span style={{ color: 'var(--gold)' }}>One</span>

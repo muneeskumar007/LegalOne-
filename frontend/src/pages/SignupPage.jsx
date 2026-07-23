@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
-import { Gavel, Eye, EyeOff, AlertCircle, CheckCircle } from 'lucide-react'
+import { Scale, Eye, EyeOff, AlertCircle, CheckCircle } from 'lucide-react'
 
 const Field = ({ label, children }) => (
   <div style={{ marginBottom: 13 }}>
@@ -29,6 +29,9 @@ export default function SignupPage() {
     if (form.password.length < 6) { setLocalErr('Password must be at least 6 characters'); return }
     const res = await signup(form)
     if (res.success) navigate('/')
+    else if (!res.message || res.message === 'Signup failed') {
+      setLocalErr('Cannot reach server. Please ensure the backend is running on port 8000.')
+    }
   }
 
   const displayErr = localErr || error
@@ -44,8 +47,8 @@ export default function SignupPage() {
 
         {/* Logo */}
         <div style={{ textAlign: 'center', marginBottom: 28 }}>
-          <div style={{ width: 52, height: 52, borderRadius: 12, margin: '0 auto 14px', background: 'linear-gradient(135deg, var(--gold), var(--gold-dim))', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 0 36px rgba(212,168,67,0.3)' }}>
-            <Gavel size={25} color="#0f0d0a" strokeWidth={2} />
+          <div style={{ width: 52, height: 52, borderRadius: 12, margin: '0 auto 14px', background: '#111', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 20px rgba(0,0,0,0.18)' }}>
+            <Scale size={25} color="#fff" strokeWidth={1.8} />
           </div>
           <h1 style={{ fontFamily: 'Playfair Display,serif', fontSize: 24, fontWeight: 700, marginBottom: 4 }}>
             Legal<span style={{ color: 'var(--gold)' }}>One</span>
@@ -66,10 +69,10 @@ export default function SignupPage() {
             {/* Name + Email row */}
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
               <Field label="Full Name *">
-                <input className="legal-input" style={{ fontSize: 14 }} value={form.name} onChange={set('name')} placeholder="Adv. Ravi Kumar" disabled={loading} autoFocus />
+                <input className="legal-input" style={{ fontSize: 14 }} value={form.name} onChange={set('name')} placeholder="Adv. Orange Kumar" disabled={loading} autoFocus />
               </Field>
               <Field label="Email *">
-                <input type="email" className="legal-input" style={{ fontSize: 14 }} value={form.email} onChange={set('email')} placeholder="ravi@example.com" disabled={loading} />
+                <input type="email" className="legal-input" style={{ fontSize: 14 }} value={form.email} onChange={set('email')} placeholder="orange@example.com" disabled={loading} />
               </Field>
             </div>
 
@@ -91,15 +94,15 @@ export default function SignupPage() {
             {/* Bar + Court row */}
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
               <Field label="Bar Council No.">
-                <input className="legal-input" style={{ fontSize: 14 }} value={form.bar_number} onChange={set('bar_number')} placeholder="TN/1234/2020" disabled={loading} />
+                <input className="legal-input" style={{ fontSize: 14 }} value={form.bar_number} onChange={set('bar_number')} placeholder="TN/1234/2026" disabled={loading} />
               </Field>
               <Field label="Court / District">
-                <input className="legal-input" style={{ fontSize: 14 }} value={form.court} onChange={set('court')} placeholder="Krishnagiri District" disabled={loading} />
+                <input className="legal-input" style={{ fontSize: 14 }} value={form.court} onChange={set('court')} placeholder=" District" disabled={loading} />
               </Field>
             </div>
 
             <Field label="Phone (optional)">
-              <input className="legal-input" style={{ fontSize: 14 }} value={form.phone} onChange={set('phone')} placeholder="+91 99521 20941" disabled={loading} />
+              <input className="legal-input" style={{ fontSize: 14 }} value={form.phone} onChange={set('phone')} placeholder="+91 9383736353" disabled={loading} />
             </Field>
 
             {/* Benefits */}
