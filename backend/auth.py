@@ -4,13 +4,13 @@ Uses HS256 tokens, bcrypt password hashing.
 """
 
 import os
+import bcrypt as _bcrypt
 from datetime import datetime, timedelta
 from typing import Optional
 
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from jose import JWTError, jwt
-from passlib.context import CryptContext
 from sqlalchemy.orm import Session
 
 from database import get_db, Advocate
@@ -20,17 +20,21 @@ SECRET_KEY      = os.getenv("SECRET_KEY", "legalone-secret-key-change-in-product
 ALGORITHM       = "HS256"
 ACCESS_EXPIRE   = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "1440"))  # 24 hours
 
-pwd_context  = CryptContext(schemes=["bcrypt"], deprecated="auto")
 bearer_scheme = HTTPBearer(auto_error=False)
 
 
-# ── Password helpers ──────────────────────────────────────────────────────────
+# ── Password helpers (direct bcrypt — no passlib) ─────────────────────────────
 
 def hash_password(plain: str) -> str:
-    return pwd_context.hash(plain)
+    """Hash a password with bcrypt. Truncates to 72 bytes (bcrypt limit)."""
+    return _bcrypt.hashpw(plain[:72].encode('utf-8'), _bcrypt.gensalt(rounds=12)).decode('utf-8')
 
 def verify_password(plain: str, hashed: str) -> bool:
-    return pwd_context.verify(plain, hashed)
+    """Verify a plaintext password against a bcrypt hash."""
+    try:
+        return _bcrypt.checkpw(plain[:72].encode('utf-8'), hashed.encode('utf-8'))
+    except Exception:
+        return False
 
 
 # ── Token helpers ─────────────────────────────────────────────────────────────

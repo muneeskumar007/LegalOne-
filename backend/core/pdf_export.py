@@ -226,3 +226,8 @@ def generate_pdf(draft_text: str, metadata: dict) -> tuple:
             print(f"[PDF] ReportLab error: {e}")
 
     return _build_plain_text(draft_text), "text/plain; charset=utf-8"
+
+
+
+
+ 
