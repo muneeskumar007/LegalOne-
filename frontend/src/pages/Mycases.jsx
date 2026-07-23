@@ -430,7 +430,7 @@ export default function MyCasesPage() {
       </div>
       <div style={{ display: 'flex', gap: 10 }}>
         <button onClick={() => navigate('/login')} style={{
-          padding: '10px 24px', background: 'var(--text-primary)', color: '#fff',
+          padding: '10px 24px', background: 'var(--accent)', color: 'var(--accent-text)',
           border: 'none', borderRadius: 9, fontWeight: 600, fontSize: 14, cursor: 'pointer',
         }}>Sign In</button>
         <button onClick={() => navigate('/signup')} style={{
@@ -456,11 +456,13 @@ export default function MyCasesPage() {
           --bg-canvas: #f8f9fa; --bg-primary: #ffffff; --bg-card: #f4f4f5;
           --text-primary: #111827; --text-secondary: #374151; --text-muted: #9ca3af;
           --border: #e5e7eb;
+          --accent: #111827; --accent-text: #ffffff;
         }
         [data-theme="dark"] {
           --bg-canvas: #111; --bg-primary: #1a1a1a; --bg-card: #222;
           --text-primary: #f1f1f1; --text-secondary: #ccc; --text-muted: #666;
           --border: #2a2a2a;
+          --accent: #f1f1f1; --accent-text: #111111;
         }
       `}</style>
 
@@ -534,8 +536,8 @@ export default function MyCasesPage() {
             <button key={f} onClick={() => setFilter(f)} style={{
               padding: '9px 16px', borderRadius: 9, fontSize: 12.5, fontWeight: 600,
               cursor: 'pointer', border: '1px solid var(--border)',
-              background: filter === f ? 'var(--text-primary)' : 'var(--bg-primary)',
-              color: filter === f ? '#fff' : 'var(--text-secondary)',
+              background: filter === f ? 'var(--accent)' : 'var(--bg-primary)',
+              color: filter === f ? 'var(--accent-text)' : 'var(--text-secondary)',
               textTransform: 'capitalize', transition: 'all 0.15s',
             }}>
               {f === 'all' ? 'All Cases' : f === 'starred' ? '⭐ Starred' : 'Drafts'}
@@ -579,7 +581,7 @@ export default function MyCasesPage() {
               Generate a draft in AI Drafter and it will be saved here automatically.
             </div>
             <button onClick={() => navigate('/draft')} style={{
-              padding: '10px 22px', background: 'var(--text-primary)', color: '#fff',
+              padding: '10px 22px', background: 'var(--accent)', color: 'var(--accent-text)',
               border: 'none', borderRadius: 9, fontWeight: 600, fontSize: 13, cursor: 'pointer',
             }}>
               Go to AI Drafter

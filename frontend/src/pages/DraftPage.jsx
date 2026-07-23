@@ -429,8 +429,32 @@ function ProfileDropdown({ advocate, isLoggedIn, onClose, onProfile, onLogout, o
               <div style={{ fontSize: 11.5, color: 'var(--text-muted)', marginTop: 4, lineHeight: 1.4 }}>Sign in to save drafts to My Cases</div>
             </div>
             <div style={{ padding: '10px' }}>
-              <button onClick={onLogin} style={{ width: '100%', padding: '10px 14px', borderRadius: 8, background: 'var(--text-primary)', border: 'none', color: '#fff', fontSize: 13, fontWeight: 600, cursor: 'pointer', marginBottom: 6 }}>Sign In</button>
-              <button onClick={onRegister} style={{ width: '100%', padding: '9px 14px', borderRadius: 8, background: 'none', border: '1px solid var(--border)', color: 'var(--text-secondary)', fontSize: 13, fontWeight: 500, cursor: 'pointer' }}>Create Account</button>
+              {/* <button onClick={onLogin} style={{ width: '100%', padding: '10px 14px', borderRadius: 8, background: 'var(--text-primary)', border: 'none', color: '#fff', fontSize: 13, fontWeight: 600, cursor: 'pointer', marginBottom: 6 }}>Sign In</button>
+              <button onClick={onRegister} style={{ width: '100%', padding: '9px 14px', borderRadius: 8, background: 'none', border: '1px solid var(--border)', color: 'var(--text-secondary)', fontSize: 13, fontWeight: 500, cursor: 'pointer' }}>Create Account</button> */}
+              <button onClick={onLogin} style={{
+                width: '100%', padding: '10px 14px', borderRadius: 8,
+                background: 'var(--accent)', border: 'none',
+                color: 'var(--accent-text)', fontSize: 13, fontWeight: 600,
+                cursor: 'pointer', marginBottom: 6,
+                transition: 'opacity 0.15s',
+              }}
+                onMouseEnter={e => e.currentTarget.style.opacity = '0.85'}
+                onMouseLeave={e => e.currentTarget.style.opacity = '1'}
+              >
+                Sign In
+              </button>
+              <button onClick={onRegister} style={{
+                width: '100%', padding: '9px 14px', borderRadius: 8,
+                background: 'none', border: '1px solid var(--border)',
+                color: 'var(--text-secondary)', fontSize: 13, fontWeight: 500,
+                cursor: 'pointer',
+                transition: 'background 0.15s',
+              }}
+                onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-card)'}
+                onMouseLeave={e => e.currentTarget.style.background = 'none'}
+              >
+                Create Account
+              </button>
             </div>
           </>
         )}
@@ -969,7 +993,12 @@ export default function DraftPage() {
             <button id="profile-btn" title="Profile" onClick={() => setShowProfile(v => !v)}
               style={{ ...iconBtnStyle, background: showProfile ? 'var(--bg-card)' : 'transparent', border: showProfile ? '1px solid var(--border)' : '1px solid transparent' }}>
               {isLoggedIn
-                ? <div style={{ width: 24, height: 24, borderRadius: '50%', background: 'var(--text-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 700, color: '#fff' }}>
+                ? <div style={{
+                    width: 24, height: 24, borderRadius: '50%',
+                    background: 'var(--accent)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontSize: 10, fontWeight: 700, color: 'var(--accent-text)', letterSpacing: 0
+                  }}>
                     {advocate?.name?.charAt(0)?.toUpperCase() || 'A'}
                   </div>
                 : <User size={17} strokeWidth={1.5} color="var(--text-muted)" />
@@ -1042,7 +1071,7 @@ export default function DraftPage() {
           )}
 
           {/* ── Case details input card ── */}
-          <div style={{
+          {/* <div style={{
             background: 'var(--bg-primary)',
             border: '1px solid var(--border)',
             borderRadius: 14, overflow: 'hidden',
@@ -1062,7 +1091,55 @@ export default function DraftPage() {
                 minHeight: 140, boxSizing: 'border-box',
               }}
               rows={6}
-            />
+            /> */}
+            {/* ── Draft Type Section ── */}
+            <div>
+              <h2 style={{ fontSize: 12.5, fontWeight: 600, color: 'var(--text-secondary)', marginBottom: 12, letterSpacing: '0.04em', textTransform: 'uppercase' }}>
+                Select type of drafting
+              </h2>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 10 }}>
+                {DRAFT_TYPES.map(({ id, label, sub, Icon }) => {
+                  const isActive = selectedDraft === id
+                  return (
+                    <button
+                      key={id}
+                      id={`draft-type-${id}`}
+                      onClick={() => { setSelectedDraft(id); handleReset() }}
+                      style={{
+                        position: 'relative',
+                        display: 'flex', flexDirection: 'column',
+                        alignItems: 'center', justifyContent: 'center',
+                        gap: 8, padding: '18px 8px', borderRadius: 12,
+                        background: 'var(--bg-primary)',
+                        border: isActive ? '2px solid var(--text-primary)' : '1px solid var(--border)',
+                        cursor: 'pointer', textAlign: 'center',
+                        transition: 'all 0.2s',
+                        boxShadow: isActive ? '0 2px 12px rgba(0,0,0,0.08)' : 'none',
+                      }}
+                      onMouseEnter={e => { if (!isActive) e.currentTarget.style.borderColor = 'var(--border-light)' }}
+                      onMouseLeave={e => { if (!isActive) e.currentTarget.style.borderColor = 'var(--border)' }}
+                    >
+                      {/* Active checkmark badge */}
+                      {isActive && (
+                        <span style={{
+                          position: 'absolute', top: -9, right: -9,
+                          width: 20, height: 20, borderRadius: '50%',
+                          background: 'var(--accent)',
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        }}>
+                          <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+                            <path d="M2 5l2.5 2.5 3.5-4" stroke="var(--accent-text)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                          </svg>
+                        </span>
+                      )}
+                      <Icon size={24} strokeWidth={1.5} color={isActive ? 'var(--text-primary)' : 'var(--text-muted)'} />
+                      <span style={{ fontSize: 11.5, fontWeight: 700, color: 'var(--text-primary)', lineHeight: 1.2 }}>{label}</span>
+                      <span style={{ fontSize: 10, color: 'var(--text-muted)', lineHeight: 1.3 }}>{sub}</span>
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
 
             {/* Card footer */}
             <div style={{
@@ -1099,6 +1176,8 @@ export default function DraftPage() {
               </div>
             </div>
           </div>
+           )}
+      
 
           {/* ── Draft Type selector ── */}
           <div>
@@ -1147,6 +1226,8 @@ export default function DraftPage() {
               })}
             </div>
           </div>
+          
+           
 
           {/* ── Arguments Side Selector (only for arguments type) ── */}
           {selectedDraft === 'arguments' && (
@@ -1229,8 +1310,8 @@ export default function DraftPage() {
             </div>
           </div>
 
-        </div>
-      )}
+         
+      
 
       {/* ── Keyframe animations ── */}
       <style>{`
