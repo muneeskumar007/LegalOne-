@@ -524,8 +524,8 @@ function ProfileDropdown({ advocate, isLoggedIn, onClose, onProfile, onLogout, o
             <div style={{ padding: '10px' }}>
               <button onClick={onLogin} style={{
                 width: '100%', padding: '10px 14px', borderRadius: 8,
-                background: 'var(--text-primary)', border: 'none',
-                color: '#fff', fontSize: 13, fontWeight: 600,
+                background: 'var(--accent)', border: 'none',
+                color: 'var(--accent-text)', fontSize: 13, fontWeight: 600,
                 cursor: 'pointer', marginBottom: 6,
                 transition: 'opacity 0.15s',
               }}
@@ -887,9 +887,9 @@ export default function DraftPage() {
               {isLoggedIn
                 ? <div style={{
                     width: 24, height: 24, borderRadius: '50%',
-                    background: 'var(--text-primary)',
+                    background: 'var(--accent)',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontSize: 10, fontWeight: 700, color: '#fff', letterSpacing: 0
+                    fontSize: 10, fontWeight: 700, color: 'var(--accent-text)', letterSpacing: 0
                   }}>
                     {advocate?.name?.charAt(0)?.toUpperCase() || 'A'}
                   </div>
@@ -1056,11 +1056,11 @@ export default function DraftPage() {
                         <span style={{
                           position: 'absolute', top: -9, right: -9,
                           width: 20, height: 20, borderRadius: '50%',
-                          background: 'var(--text-primary)',
+                          background: 'var(--accent)',
                           display: 'flex', alignItems: 'center', justifyContent: 'center',
                         }}>
                           <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
-                            <path d="M2 5l2.5 2.5 3.5-4" stroke="#fff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                            <path d="M2 5l2.5 2.5 3.5-4" stroke="var(--accent-text)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
                           </svg>
                         </span>
                       )}

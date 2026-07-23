@@ -13,25 +13,25 @@ const NAV = [
 ]
 
 /* ── Balance / Scales SVG Logo ── */
-function ScalesLogo({ size = 48 }) {
+function ScalesLogo({ size = 48, color = 'var(--text-primary)' }) {
   return (
     <svg width={size} height={size} viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <polygon points="40,4 33,16 47,16" fill="#0a0a0a"/>
-      <circle cx="40" cy="6" r="2" fill="#0a0a0a"/>
-      <rect x="6" y="15" width="68" height="2.5" rx="1.25" fill="#0a0a0a"/>
-      <rect x="38.5" y="17" width="3" height="40" fill="#0a0a0a"/>
-      <circle cx="40" cy="22" r="2.5" fill="#0a0a0a"/>
-      <path d="M28 57 L40 57 L52 57" stroke="#0a0a0a" strokeWidth="2.5" strokeLinecap="round"/>
-      <path d="M24 62 Q32 57 40 57 Q48 57 56 62" stroke="#0a0a0a" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
-      <rect x="22" y="62" width="36" height="2.5" rx="1.25" fill="#0a0a0a"/>
-      <line x1="10" y1="17" x2="6" y2="34" stroke="#0a0a0a" strokeWidth="1.8" strokeLinecap="round"/>
-      <line x1="10" y1="17" x2="14" y2="34" stroke="#0a0a0a" strokeWidth="1.8" strokeLinecap="round"/>
-      <path d="M3 34 Q10 46 17 34" stroke="#0a0a0a" strokeWidth="2.2" fill="none" strokeLinecap="round"/>
-      <line x1="3" y1="34" x2="17" y2="34" stroke="#0a0a0a" strokeWidth="1.5" strokeLinecap="round"/>
-      <line x1="70" y1="17" x2="66" y2="34" stroke="#0a0a0a" strokeWidth="1.8" strokeLinecap="round"/>
-      <line x1="70" y1="17" x2="74" y2="34" stroke="#0a0a0a" strokeWidth="1.8" strokeLinecap="round"/>
-      <path d="M63 34 Q70 46 77 34" stroke="#0a0a0a" strokeWidth="2.2" fill="none" strokeLinecap="round"/>
-      <line x1="63" y1="34" x2="77" y2="34" stroke="#0a0a0a" strokeWidth="1.5" strokeLinecap="round"/>
+      <polygon points="40,4 33,16 47,16" fill={color}/>
+      <circle cx="40" cy="6" r="2" fill={color}/>
+      <rect x="6" y="15" width="68" height="2.5" rx="1.25" fill={color}/>
+      <rect x="38.5" y="17" width="3" height="40" fill={color}/>
+      <circle cx="40" cy="22" r="2.5" fill={color}/>
+      <path d="M28 57 L40 57 L52 57" stroke={color} strokeWidth="2.5" strokeLinecap="round"/>
+      <path d="M24 62 Q32 57 40 57 Q48 57 56 62" stroke={color} strokeWidth="2.5" fill="none" strokeLinecap="round"/>
+      <rect x="22" y="62" width="36" height="2.5" rx="1.25" fill={color}/>
+      <line x1="10" y1="17" x2="6" y2="34" stroke={color} strokeWidth="1.8" strokeLinecap="round"/>
+      <line x1="10" y1="17" x2="14" y2="34" stroke={color} strokeWidth="1.8" strokeLinecap="round"/>
+      <path d="M3 34 Q10 46 17 34" stroke={color} strokeWidth="2.2" fill="none" strokeLinecap="round"/>
+      <line x1="3" y1="34" x2="17" y2="34" stroke={color} strokeWidth="1.5" strokeLinecap="round"/>
+      <line x1="70" y1="17" x2="66" y2="34" stroke={color} strokeWidth="1.8" strokeLinecap="round"/>
+      <line x1="70" y1="17" x2="74" y2="34" stroke={color} strokeWidth="1.8" strokeLinecap="round"/>
+      <path d="M63 34 Q70 46 77 34" stroke={color} strokeWidth="2.2" fill="none" strokeLinecap="round"/>
+      <line x1="63" y1="34" x2="77" y2="34" stroke={color} strokeWidth="1.5" strokeLinecap="round"/>
     </svg>
   )
 }
@@ -108,11 +108,11 @@ function UserMenu({ advocate, logout, collapsed }) {
         }}>
           <div style={{
             width: 36, height: 36, borderRadius: '50%',
-            background: '#e5e5e5',
+            background: 'var(--bg-card)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             flexShrink: 0
           }}>
-            <User size={18} color="#737373" />
+            <User size={18} color="var(--text-muted)" />
           </div>
           {!collapsed && (
             <>
