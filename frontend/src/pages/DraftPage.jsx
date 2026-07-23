@@ -1071,7 +1071,7 @@ export default function DraftPage() {
           )}
 
           {/* ── Case details input card ── */}
-          {/* <div style={{
+          <div style={{
             background: 'var(--bg-primary)',
             border: '1px solid var(--border)',
             borderRadius: 14, overflow: 'hidden',
@@ -1091,54 +1091,9 @@ export default function DraftPage() {
                 minHeight: 140, boxSizing: 'border-box',
               }}
               rows={6}
-            /> */}
-            {/* ── Draft Type Section ── */}
-            <div>
-              <h2 style={{ fontSize: 12.5, fontWeight: 600, color: 'var(--text-secondary)', marginBottom: 12, letterSpacing: '0.04em', textTransform: 'uppercase' }}>
-                Select type of drafting
-              </h2>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 10 }}>
-                {DRAFT_TYPES.map(({ id, label, sub, Icon }) => {
-                  const isActive = selectedDraft === id
-                  return (
-                    <button
-                      key={id}
-                      id={`draft-type-${id}`}
-                      onClick={() => { setSelectedDraft(id); handleReset() }}
-                      style={{
-                        position: 'relative',
-                        display: 'flex', flexDirection: 'column',
-                        alignItems: 'center', justifyContent: 'center',
-                        gap: 8, padding: '18px 8px', borderRadius: 12,
-                        background: 'var(--bg-primary)',
-                        border: isActive ? '2px solid var(--text-primary)' : '1px solid var(--border)',
-                        cursor: 'pointer', textAlign: 'center',
-                        transition: 'all 0.2s',
-                        boxShadow: isActive ? '0 2px 12px rgba(0,0,0,0.08)' : 'none',
-                      }}
-                      onMouseEnter={e => { if (!isActive) e.currentTarget.style.borderColor = 'var(--border-light)' }}
-                      onMouseLeave={e => { if (!isActive) e.currentTarget.style.borderColor = 'var(--border)' }}
-                    >
-                      {/* Active checkmark badge */}
-                      {isActive && (
-                        <span style={{
-                          position: 'absolute', top: -9, right: -9,
-                          width: 20, height: 20, borderRadius: '50%',
-                          background: 'var(--accent)',
-                          display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        }}>
-                          <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
-                            <path d="M2 5l2.5 2.5 3.5-4" stroke="var(--accent-text)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-                          </svg>
-                        </span>
-                      )}
-                      <Icon size={24} strokeWidth={1.5} color={isActive ? 'var(--text-primary)' : 'var(--text-muted)'} />
-                      <span style={{ fontSize: 11.5, fontWeight: 700, color: 'var(--text-primary)', lineHeight: 1.2 }}>{label}</span>
-                      <span style={{ fontSize: 10, color: 'var(--text-muted)', lineHeight: 1.3 }}>{sub}</span>
-                    </button>
-                  )
-                })}
-              </div>
+            />
+            
+              
             </div>
 
             {/* Card footer */}
