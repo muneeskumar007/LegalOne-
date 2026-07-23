@@ -27,3 +27,6 @@ bcrypt==4.3.0
 
 SQLAlchemy==2.0.43
 aiosqlite==0.21.0
+
+# new
+python-docx==1.2.0

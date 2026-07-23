@@ -154,7 +154,7 @@ function MissingDetailsPopup({
           <div style={{
             display: 'inline-flex', alignItems: 'center', gap: 6,
             padding: '4px 10px', borderRadius: 999,
-            background: 'rgba(10,10,10,0.06)',
+           background: 'var(--focus-ring)',
             fontSize: 11.5, color: 'var(--text-secondary)', fontWeight: 600
           }}>
             <CheckCircle2 size={12} color="#22c55e" />
@@ -254,14 +254,14 @@ function MissingDetailsPopup({
                         outline: 'none', boxSizing: 'border-box',
                         transition: 'border-color 0.2s',
                       }}
-                      onFocus={e => { e.target.style.borderColor = 'var(--text-primary)'; e.target.style.boxShadow = '0 0 0 3px rgba(10,10,10,0.06)' }}
+                     onFocus={e => { e.target.style.borderColor = 'var(--text-primary)'; e.target.style.boxShadow = '0 0 0 3px var(--focus-ring)' }}
                       onBlur={e  => { e.target.style.borderColor = 'var(--border-light)'; e.target.style.boxShadow = 'none' }}
                     />
                     <button
                       onClick={() => setExpandedField(null)}
                       style={{
                         marginTop: 8, padding: '6px 14px', borderRadius: 7,
-                        background: 'var(--text-primary)', color: '#fff',
+                        background: 'var(--accent)', color: 'var(--accent-text)',  
                         border: 'none', fontSize: 12, fontWeight: 600,
                         cursor: 'pointer'
                       }}
@@ -318,8 +318,8 @@ function MissingDetailsPopup({
             disabled={isLoading || filledCount === 0}
             style={{
               padding: '9px 22px', borderRadius: 9,
-              background: filledCount === 0 ? '#d4d4d4' : 'var(--text-primary)',
-              color: '#fff', border: 'none',
+             background: filledCount === 0 ? '#d4d4d4' : 'var(--accent)',
+color: 'var(--accent-text)', border: 'none',
               fontSize: 13, fontWeight: 600,
               cursor: filledCount === 0 ? 'not-allowed' : 'pointer',
               display: 'flex', alignItems: 'center', gap: 8,
@@ -403,8 +403,8 @@ function DraftOutput({ draft, onReset, selectedDraftLabel }) {
             display: 'flex', alignItems: 'center', gap: 6,
             padding: '7px 14px', borderRadius: 9,
             border: 'none',
-            background: 'var(--text-primary)',
-            color: '#fff',
+            background: 'var(--accent)', color: 'var(--accent-text)',
+            
             fontSize: 12.5, fontWeight: 600, cursor: 'pointer',
           }}>
             <Download size={13} /> Download .txt
@@ -510,7 +510,7 @@ function ProfileDropdown({ advocate, isLoggedIn, onClose, onProfile, onLogout, o
             <div style={{ padding: '18px 16px 14px', borderBottom: '1px solid var(--border)', textAlign: 'center' }}>
               <div style={{
                 width: 44, height: 44, borderRadius: '50%',
-                background: 'var(--bg-card)', border: '1px solid var(--border)',
+                background: 'var(--accent)', color: 'var(--accent-text)', border: '1px solid var(--border)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 margin: '0 auto 10px',
               }}>
@@ -524,8 +524,8 @@ function ProfileDropdown({ advocate, isLoggedIn, onClose, onProfile, onLogout, o
             <div style={{ padding: '10px' }}>
               <button onClick={onLogin} style={{
                 width: '100%', padding: '10px 14px', borderRadius: 8,
-                background: 'var(--text-primary)', border: 'none',
-                color: '#fff', fontSize: 13, fontWeight: 600,
+                background: 'var(--accent)', border: 'none',
+                color: 'var(--accent-text)', fontSize: 13, fontWeight: 600,
                 cursor: 'pointer', marginBottom: 6,
                 transition: 'opacity 0.15s',
               }}
@@ -887,9 +887,9 @@ export default function DraftPage() {
               {isLoggedIn
                 ? <div style={{
                     width: 24, height: 24, borderRadius: '50%',
-                    background: 'var(--text-primary)',
+                    background: 'var(--accent)',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontSize: 10, fontWeight: 700, color: '#fff', letterSpacing: 0
+                    fontSize: 10, fontWeight: 700, color: 'var(--accent-text)', letterSpacing: 0
                   }}>
                     {advocate?.name?.charAt(0)?.toUpperCase() || 'A'}
                   </div>
@@ -1056,11 +1056,11 @@ export default function DraftPage() {
                         <span style={{
                           position: 'absolute', top: -9, right: -9,
                           width: 20, height: 20, borderRadius: '50%',
-                          background: 'var(--text-primary)',
+                          background: 'var(--accent)',
                           display: 'flex', alignItems: 'center', justifyContent: 'center',
                         }}>
                           <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
-                            <path d="M2 5l2.5 2.5 3.5-4" stroke="#fff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                            <path d="M2 5l2.5 2.5 3.5-4" stroke="var(--accent-text)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
                           </svg>
                         </span>
                       )}
@@ -1103,8 +1103,8 @@ export default function DraftPage() {
                   disabled={isLoading || !text.trim()}
                   style={{
                     display: 'flex', alignItems: 'center', gap: 8,
-                    background: !text.trim() ? '#d4d4d4' : 'var(--text-primary)',
-                    color: '#fff',
+                    background: !text.trim() ? '#d4d4d4' : 'var(--accent)',
+color: 'var(--accent-text)',
                     border: 'none',
                     padding: '11px 24px', borderRadius: 10,
                     fontSize: 13.5, fontWeight: 700,
@@ -1130,12 +1130,27 @@ export default function DraftPage() {
 
       {/* ── Keyframe animations (injected once) ── */}
       <style>{`
-        @keyframes fadeIn   { from { opacity:0 }                        to { opacity:1 } }
-        @keyframes popupIn  { from { opacity:0; transform:translate(-50%,-48%) scale(0.96) } to { opacity:1; transform:translate(-50%,-50%) scale(1) } }
-        @keyframes bounce   { 0%,80%,100% { transform:scale(0) } 40% { transform:scale(1) } }
-        @keyframes pulse    { 0%,100% { opacity:1 } 50% { opacity:0.4 } }
-        @keyframes spin     { to { transform:rotate(360deg) } }
-      `}</style>
+         
+  @keyframes fadeIn   { from { opacity:0 }                        to { opacity:1 } }
+  @keyframes popupIn  { from { opacity:0; transform:translate(-50%,-48%) scale(0.96) } to { opacity:1; transform:translate(-50%,-50%) scale(1) } }
+  @keyframes bounce   { 0%,80%,100% { transform:scale(0) } 40% { transform:scale(1) } }
+  @keyframes pulse    { 0%,100% { opacity:1 } 50% { opacity:0.4 } }
+  @keyframes spin     { to { transform:rotate(360deg) } }
+
+  :root {
+    --accent: #111827;
+    --accent-text: #ffffff;
+    --focus-ring: rgba(10,10,10,0.06);
+  }
+  [data-theme="dark"] {
+    --accent: #f1f1f1;
+    --accent-text: #111111;
+    --focus-ring: rgba(255,255,255,0.08);
+  }
+`} 
+      
+      
+      </style>
     </div>
   )
 }
@@ -1151,3 +1166,6 @@ const iconBtnStyle = {
   transition: 'all 0.18s',
   flexShrink: 0,
 }
+
+
+ 
