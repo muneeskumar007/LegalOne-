@@ -72,7 +72,7 @@ const ACTS = [
   },
   {
     name: 'Consumer Protection Act, 2019', short: 'CPA',
-    color: 'rgba(74,222,128,0.08)', textColor: 'var(--success)',
+    // color: 'rgba(74,222,128,0.08)', textColor: 'var(--success)',
     sections: [
       { sec: 'Section 2(7)', desc: 'Definition of "consumer"' },
       { sec: 'Section 34',   desc: 'Jurisdiction of District Commission' },
