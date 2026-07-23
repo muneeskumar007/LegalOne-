@@ -956,3 +956,230 @@ body {
   overflow: hidden;      /* clips label text if it ever peeks out during collapse transition */
   white-space: nowrap;
 } 
+
+
+
+
+
+
+
+
+
+
+
+
+
+:root {
+  --jd-bw-bg:        #ffffff;
+  --jd-bw-surface:   #ffffff;
+  --jd-bw-border:    #d4d4d4;
+  --jd-bw-text:      #111111;
+  --jd-bw-muted:     #6b6b6b;
+  --jd-bw-accent:    #000000;
+  --jd-bw-accent-fg: #ffffff;
+  --jd-bw-danger:    #111111; /* delete actions use the same ink, not red, to stay strictly B&W */
+}
+
+.jd-page {
+  background: var(--jd-bw-bg) !important;
+  color: var(--jd-bw-text) !important;
+  min-height: 100vh;
+}
+
+/* Header */
+.jd-app-header {
+  background: var(--jd-bw-surface) !important;
+  border-bottom: 1px solid var(--jd-bw-border) !important;
+  color: var(--jd-bw-text) !important;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 24px 32px;
+}
+.jd-eyebrow {
+  color: var(--jd-bw-muted) !important;
+  letter-spacing: 0.08em;
+  font-size: 11px;
+  font-weight: 700;
+  margin: 0 0 4px;
+}
+.jd-app-header h1 {
+  margin: 0 0 6px;
+  font-size: 24px;
+  letter-spacing: 0.02em;
+}
+.jd-header-subtitle {
+  color: var(--jd-bw-muted) !important;
+  margin: 0;
+  font-size: 13px;
+}
+.jd-header-actions {
+  display: flex;
+  gap: 8px;
+}
+.jd-header-actions button {
+  background: #ffffff !important;
+  border: 1px solid var(--jd-bw-border) !important;
+  color: var(--jd-bw-text) !important;
+  width: 36px; height: 36px;
+  border-radius: 9px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+}
+.jd-header-actions .jd-profile-button {
+  background: var(--jd-bw-accent) !important;
+  color: var(--jd-bw-accent-fg) !important;
+  border-color: var(--jd-bw-accent) !important;
+}
+
+/* Error banner */
+.jd-error-banner {
+  margin: 16px 32px 0;
+  padding: 12px 16px;
+  border: 1px solid var(--jd-bw-border);
+  border-left: 3px solid #000000;
+  background: #f5f5f5;
+  color: var(--jd-bw-text);
+  font-size: 13px;
+}
+
+/* Stat cards */
+.jd-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  padding: 20px 32px 0;
+}
+.jd-stat-grid [class*="stat-card"],
+.jd-stat-grid > div > div {
+  background: var(--jd-bw-surface) !important;
+  border: 1px solid var(--jd-bw-border) !important;
+  color: var(--jd-bw-text) !important;
+  border-top: 3px solid var(--jd-bw-accent) !important;
+}
+.jd-stat-grid [class*="icon"] {
+  background: #f2f2f2 !important;
+  color: var(--jd-bw-text) !important;
+  border-color: var(--jd-bw-border) !important;
+}
+
+/* Cases section */
+.jd-cases-section {
+  margin: 20px 32px 40px;
+  background: var(--jd-bw-surface) !important;
+  border: 1px solid var(--jd-bw-border) !important;
+  color: var(--jd-bw-text) !important;
+  border-radius: 14px;
+  padding: 20px;
+}
+.jd-section-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 16px;
+}
+.jd-section-heading h2 {
+  margin: 0 0 4px;
+  font-size: 18px;
+}
+.jd-section-heading p {
+  color: var(--jd-bw-muted) !important;
+  margin: 0;
+  font-size: 13px;
+}
+
+/* Primary / secondary buttons */
+.jd-primary-button {
+  background: var(--jd-bw-accent) !important;
+  color: var(--jd-bw-accent-fg) !important;
+  border: 1px solid var(--jd-bw-accent) !important;
+  box-shadow: none !important;
+  padding: 9px 16px;
+  border-radius: 9px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+}
+.jd-primary-button:hover { background: #222222 !important; }
+
+.jd-secondary-button {
+  background: #ffffff !important;
+  color: var(--jd-bw-text) !important;
+  border: 1px solid var(--jd-bw-border) !important;
+  padding: 9px 16px;
+  border-radius: 9px;
+  font-weight: 500;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+/* Sign-in gate */
+.jd-signin-gate {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+}
+.jd-signin-card {
+  text-align: center;
+  max-width: 380px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+.jd-signin-card h2 { margin: 8px 0 0; font-size: 20px; }
+.jd-signin-card p  { color: var(--jd-bw-muted); font-size: 13px; line-height: 1.6; margin: 0 0 8px; }
+.jd-signin-actions { display: flex; gap: 10px; }
+
+/* Tabs — best-effort selectors, adjust class name if CategoryTabs uses different ones */
+[class*="tab"] {
+  color: var(--jd-bw-text) !important;
+}
+[class*="tab"][class*="active"],
+[aria-selected="true"] {
+  background: var(--jd-bw-accent) !important;
+  color: var(--jd-bw-accent-fg) !important;
+  border-color: var(--jd-bw-accent) !important;
+}
+
+/* Search / filter toolbar */
+.jd-cases-section input,
+.jd-cases-section select,
+.jd-cases-section button {
+  border-color: var(--jd-bw-border) !important;
+}
+.jd-cases-section input:focus,
+.jd-cases-section select:focus {
+  outline-color: var(--jd-bw-accent) !important;
+  border-color: var(--jd-bw-accent) !important;
+}
+
+/* Table */
+.jd-cases-section table,
+.jd-cases-section thead,
+.jd-cases-section tbody,
+.jd-cases-section tr,
+.jd-cases-section th,
+.jd-cases-section td {
+  background: var(--jd-bw-surface) !important;
+  color: var(--jd-bw-text) !important;
+  border-color: var(--jd-bw-border) !important;
+}
+.jd-cases-section thead th {
+  color: var(--jd-bw-muted) !important;
+}
+
+/* Pagination */
+[class*="pagination"] button {
+  background: #ffffff !important;
+  color: var(--jd-bw-text) !important;
+  border: 1px solid var(--jd-bw-border) !important;
+}
+[class*="pagination"] button[class*="active"] {
+  background: var(--jd-bw-accent) !important;
+  color: var(--jd-bw-accent-fg) !important;
+}
