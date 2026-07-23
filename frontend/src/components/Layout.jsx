@@ -9,6 +9,7 @@ const NAV = [
    { to:'/draft',     icon:FileText,      label:'AI Drafter'       },
    { to:'/my-cases',  icon:FolderOpen,          label:'My Cases', iconUrl:'https://img.icons8.com/fluency-systems-filled/48/d4a843/briefcase.png' },
     { to:'/reference', icon:BookOpen,      label:'Bare Acts'   },
+    { to:'/judgements', icon:BookOpen,      label:'Judgements'   },
    { to:'/rag', icon:Database, label:'RAG Status' },
 ]
 
