@@ -56,7 +56,7 @@ export default function Dashboard() {
             placeholder="Search tools..."
             value={search}
             onChange={e => setSearch(e.target.value)}
-            style={{ paddingLeft: 40, fontSize: 14, background: '#ffffff' }}
+            style={{ paddingLeft: 40, fontSize: 14, background: 'var(--bg-primary)' }}
           />
         </div>
       </div>
