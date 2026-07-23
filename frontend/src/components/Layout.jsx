@@ -1,98 +1,139 @@
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { NavLink, useNavigate, useLocation } from 'react-router-dom'
-import { Scale, FileText, FolderOpen, LayoutTemplate,Database, BookOpen, Gavel, Settings, Menu, X, LogIn, LogOut, User, ChevronDown, GitBranch, GitCompare, MessageSquare, CheckCircle } from 'lucide-react'
+import { Scale, FileText, FolderOpen, LayoutTemplate, Database, BookOpen, Gavel, Settings, Menu, X, LogIn, LogOut, User, ChevronDown, GitBranch, GitCompare, MessageSquare, CheckCircle, PanelLeftClose, PanelLeftOpen } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 
 const NAV = [
   { to:'/',          icon:Scale,         label:'Dashboard'   },
    { to:'/draft',     icon:FileText,      label:'AI Drafter'       },
-   { to:'/my-cases',  icon:null,          label:'My Cases', iconUrl:'https://img.icons8.com/fluency-systems-filled/48/d4a843/briefcase.png' },
+   { to:'/my-cases',  icon:FolderOpen,          label:'My Cases', iconUrl:'https://img.icons8.com/fluency-systems-filled/48/d4a843/briefcase.png' },
     { to:'/reference', icon:BookOpen,      label:'Bare Acts'   },
-   { to:'/pipeline',  icon:GitBranch,     label:'AI Pipeline' },
    { to:'/rag', icon:Database, label:'RAG Status' },
- 
-  { to:'/arguments', icon:MessageSquare, label:'Arguments'   },
-  { to:'/validate',  icon:CheckCircle,   label:'Validate'    },
-  { to:'/compare',   icon:GitCompare,    label:'Compare'     },
-
-  
 ]
 
 /* ── Balance / Scales SVG Logo ── */
 function ScalesLogo({ size = 48 }) {
   return (
     <svg width={size} height={size} viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
-      {/* ── Top triangular crown / pediment ── */}
       <polygon points="40,4 33,16 47,16" fill="#0a0a0a"/>
-      {/* Small circle at apex */}
       <circle cx="40" cy="6" r="2" fill="#0a0a0a"/>
-
-      {/* ── Horizontal beam ── */}
       <rect x="6" y="15" width="68" height="2.5" rx="1.25" fill="#0a0a0a"/>
-
-      {/* ── Central pillar ── */}
       <rect x="38.5" y="17" width="3" height="40" fill="#0a0a0a"/>
-      {/* Pillar decorative node */}
       <circle cx="40" cy="22" r="2.5" fill="#0a0a0a"/>
-
-      {/* ── Base stand ── */}
       <path d="M28 57 L40 57 L52 57" stroke="#0a0a0a" strokeWidth="2.5" strokeLinecap="round"/>
       <path d="M24 62 Q32 57 40 57 Q48 57 56 62" stroke="#0a0a0a" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
       <rect x="22" y="62" width="36" height="2.5" rx="1.25" fill="#0a0a0a"/>
-
-      {/* ── Left side ── */}
-      {/* Left chain / strings */}
       <line x1="10" y1="17" x2="6" y2="34" stroke="#0a0a0a" strokeWidth="1.8" strokeLinecap="round"/>
       <line x1="10" y1="17" x2="14" y2="34" stroke="#0a0a0a" strokeWidth="1.8" strokeLinecap="round"/>
-      {/* Left hanging pan / dish */}
       <path d="M3 34 Q10 46 17 34" stroke="#0a0a0a" strokeWidth="2.2" fill="none" strokeLinecap="round"/>
       <line x1="3" y1="34" x2="17" y2="34" stroke="#0a0a0a" strokeWidth="1.5" strokeLinecap="round"/>
-
-      {/* ── Right side ── */}
-      {/* Right chain / strings */}
       <line x1="70" y1="17" x2="66" y2="34" stroke="#0a0a0a" strokeWidth="1.8" strokeLinecap="round"/>
       <line x1="70" y1="17" x2="74" y2="34" stroke="#0a0a0a" strokeWidth="1.8" strokeLinecap="round"/>
-      {/* Right hanging pan / dish */}
       <path d="M63 34 Q70 46 77 34" stroke="#0a0a0a" strokeWidth="2.2" fill="none" strokeLinecap="round"/>
       <line x1="63" y1="34" x2="77" y2="34" stroke="#0a0a0a" strokeWidth="1.5" strokeLinecap="round"/>
     </svg>
   )
 }
 
-function UserMenu({ advocate, logout }) {
+/* ── Portal-based tooltip: escapes any overflow:hidden/auto ancestor ── */
+function TipWrap({ label, show, children }) {
+  const ref = useRef(null)
+  const [visible, setVisible] = useState(false)
+  const [coords, setCoords] = useState({ top: 0, left: 0 })
+
+  const handleEnter = () => {
+    if (!show || !ref.current) return
+    const rect = ref.current.getBoundingClientRect()
+    setCoords({ top: rect.top + rect.height / 2, left: rect.right + 10 })
+    setVisible(true)
+  }
+  const handleLeave = () => setVisible(false)
+
+  return (
+    <div
+      ref={ref}
+      onMouseEnter={handleEnter}
+      onMouseLeave={handleLeave}
+      style={{ position: 'relative', width: '100%' }}
+    >
+      {children}
+      {show && visible && createPortal(
+        <span
+          style={{
+            position: 'fixed',
+            top: coords.top,
+            left: coords.left,
+            transform: 'translateY(-50%)',
+            background: '#171717',
+            color: '#fff',
+            fontSize: 12,
+            fontWeight: 500,
+            padding: '6px 10px',
+            borderRadius: 6,
+            whiteSpace: 'nowrap',
+            pointerEvents: 'none',
+            zIndex: 9999,
+            boxShadow: '0 4px 12px rgba(0,0,0,0.25)'
+          }}
+        >
+          {label}
+          <span style={{
+            position: 'absolute', right: '100%', top: '50%',
+            transform: 'translateY(-50%)',
+            border: '5px solid transparent', borderRightColor: '#171717'
+          }} />
+        </span>,
+        document.body
+      )}
+    </div>
+  )
+}
+
+function UserMenu({ advocate, logout, collapsed }) {
   const [open, setOpen] = useState(false)
   const navigate = useNavigate()
 
   return (
     <div style={{ position: 'relative' }}>
-      <button onClick={() => setOpen(o => !o)} style={{
-        display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px',
-        background: 'transparent', border: '1px solid var(--border)', borderRadius: 12,
-        cursor: 'pointer', width: '100%', transition: 'all 0.2s'
-      }}>
-        {/* Avatar circle */}
-        <div style={{
-          width: 36, height: 36, borderRadius: '50%',
-          background: '#e5e5e5',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          flexShrink: 0
+      <TipWrap label={advocate.name ? `Adv. ${advocate.name}` : 'Advocate'} show={collapsed}>
+        <button onClick={() => setOpen(o => !o)} style={{
+          display: 'flex', alignItems: 'center', gap: 10,
+          padding: collapsed ? '10px' : '10px 12px',
+          
+          background: 'transparent', border: '1px solid var(--border)', borderRadius: 12,
+          cursor: 'pointer', width: '100%', transition: 'all 0.2s',
+          justifyContent: collapsed ? 'center' : 'flex-start',
+          boxSizing: 'border-box'
         }}>
-          <User size={18} color="#737373" />
-        </div>
-        <div style={{ flex: 1, textAlign: 'left', minWidth: 0 }}>
-          <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-            {advocate.name ? `Adv. ${advocate.name}` : 'Advocate'}
+          <div style={{
+            width: 36, height: 36, borderRadius: '50%',
+            background: '#e5e5e5',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            flexShrink: 0
+          }}>
+            <User size={18} color="#737373" />
           </div>
-          <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>Premium Plan</div>
-        </div>
-        <ChevronDown size={14} color="var(--text-muted)" style={{ flexShrink: 0, transform: open ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
-      </button>
+          {!collapsed && (
+            <>
+              <div style={{ flex: 1, textAlign: 'left', minWidth: 0 }}>
+                <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  {advocate.name ? `Adv. ${advocate.name}` : 'Advocate'}
+                </div>
+                <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>Premium Plan</div>
+              </div>
+              <ChevronDown size={14} color="var(--text-muted)" style={{ flexShrink: 0, transform: open ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
+            </>
+          )}
+        </button>
+      </TipWrap>
 
       {open && (
         <>
           <div onClick={() => setOpen(false)} style={{ position: 'fixed', inset: 0, zIndex: 200 }} />
           <div style={{
-            position: 'absolute', bottom: '100%', left: 0, right: 0, marginBottom: 6,
+            position: 'absolute', bottom: '100%', left: 0, marginBottom: 6,
+            width: collapsed ? 220 : '100%',
             background: 'var(--bg-primary)', border: '1px solid var(--border)', borderRadius: 12,
             zIndex: 201, overflow: 'hidden', boxShadow: '0 -8px 24px rgba(0,0,0,0.12)'
           }}>
@@ -125,64 +166,113 @@ function UserMenu({ advocate, logout }) {
 
 export default function Layout({ children }) {
   const [open, setOpen] = useState(false)
+  const [collapsed, setCollapsed] = useState(false) // desktop collapse state
   const { advocate, isLoggedIn, logout } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
 
+  const SIDEBAR_WIDTH = collapsed ? 53 : 250
+
   const SidebarContent = () => (
     <>
+      {/* ── Collapse toggle ── */}
+      <div style={{
+        display: 'flex', justifyContent:   'flex-end',
+        padding: '14px 14px 0'
+      }}>
+        <TipWrap label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'} show={collapsed}>
+          <button
+            onClick={() => setCollapsed(c => !c)}
+            style={{
+              background: 'none', border: 'none', cursor: 'pointer',
+              color: 'var(--text-muted)', padding: 6, borderRadius: 8, 
+              display: 'flex', alignItems: 'center', justifyContent: 'end',
+              width: '100%'
+            }}
+            aria-label="Toggle sidebar"
+          >
+            {collapsed ? <PanelLeftOpen size={18} /> : <PanelLeftClose size={18} />}
+          </button>
+        </TipWrap>
+      </div>
+
       {/* ── Logo ── */}
-      <div style={{ padding: '28px 24px 24px', textAlign: 'center' }}>
+      <div style={{ padding: collapsed ? '10px 12px 20px' : '14px 24px 24px', textAlign: 'center' }}>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
-          <ScalesLogo size={52} />
-          <div>
-            <div style={{
-              fontFamily: 'Playfair Display, serif', fontWeight: 700, fontSize: 20,
-              color: 'var(--text-primary)', lineHeight: 1.2, letterSpacing: '-0.02em'
-            }}>
-              LegalOne AI
+          <ScalesLogo size={collapsed ? 36 : 52} />
+          {!collapsed && (
+            <div>
+              <div style={{
+                fontFamily: 'Playfair Display, serif', fontWeight: 700, fontSize: 20,
+                color: 'var(--text-primary)', lineHeight: 1.2, letterSpacing: '-0.02em'
+              }}>
+                LegalOne AI
+              </div>
+              <div style={{
+                fontSize: 10, color: 'var(--text-muted)', letterSpacing: '0.18em',
+                textTransform: 'uppercase', marginTop: 4, fontWeight: 500
+              }}>
+                AI DRAFTER
+              </div>
             </div>
-            <div style={{
-              fontSize: 10, color: 'var(--text-muted)', letterSpacing: '0.18em',
-              textTransform: 'uppercase', marginTop: 4, fontWeight: 500
-            }}>
-              AI DRAFTER
-            </div>
-          </div>
+          )}
         </div>
       </div>
 
-      <nav style={{ padding: '10px 10px', flex: 1, overflowY: 'auto' }}>
-        {/* <div style={{ fontSize: 10, color: 'var(--text-muted)', letterSpacing: '0.1em', textTransform: 'uppercase', padding: '0 4px 6px', marginBottom: 4 }}>Navigation</div> */}
+      <nav style={{ padding: '10px 10px', flex: 1, overflowY: 'auto', boxSizing: 'border-box' }}>
         {NAV.map(({ to, icon: Icon, label, iconUrl }) => (
-          <NavLink key={to} to={to} end={to==='/'} onClick={() => setOpen(false)}
-            className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
-            style={{ marginBottom: 2 }}>
-            {iconUrl ? <img src={iconUrl} alt="" width="14" height="14" style={{ opacity: 0.9 }} /> : <Icon size={14} />}<span>{label}</span>
-          </NavLink>
+          <TipWrap key={to} label={label} show={collapsed}>
+            <NavLink to={to} end={to==='/'} onClick={() => setOpen(false)}
+              className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
+              style={{
+                marginBottom: 2,
+                justifyContent: collapsed ? 'center' : 'flex-start',
+                padding: collapsed ? '10px' : undefined,
+                boxSizing: 'border-box',
+                width: '100%'
+              }}>
+              {iconUrl ? <img src={iconUrl} alt="" width="14" height="14" style={{ opacity: 0.9, flexShrink: 0 }} /> : <Icon size={14} style={{ flexShrink: 0 }} />}
+              {!collapsed && <span>{label}</span>}
+            </NavLink>
+          </TipWrap>
         ))}
       </nav>
 
       {/* ── Bottom Section ── */}
-      <div style={{ padding: '16px 14px', borderTop: '1px solid var(--border)' }}>
+      <div style={{ padding: collapsed ? '16px 10px' : '16px 14px', borderTop: '1px solid var(--border)' }}>
         {isLoggedIn ? (
           <>
-            <UserMenu advocate={advocate} logout={logout} />
-            {/* Logout row */}
-            <button onClick={() => { logout(); navigate('/') }} style={{
-              display: 'flex', alignItems: 'center', gap: 10,
-              padding: '12px 14px', marginTop: 8,
-              background: 'none', border: 'none',
-              color: 'var(--text-secondary)', fontSize: 13, fontWeight: 500,
-              cursor: 'pointer', width: '100%', borderRadius: 10,
-              transition: 'all 0.2s', letterSpacing: '0.02em'
-            }}
-            onMouseEnter={e => { e.currentTarget.style.background = '#fef2f2'; e.currentTarget.style.color = 'var(--error)' }}
-            onMouseLeave={e => { e.currentTarget.style.background = 'none'; e.currentTarget.style.color = 'var(--text-secondary)' }}
-            >
-              <LogOut size={16} strokeWidth={1.5} /> Logout
-            </button>
+            <UserMenu advocate={advocate} logout={logout} collapsed={collapsed} />
+            <TipWrap label="Logout" show={collapsed}>
+              <button onClick={() => { logout(); navigate('/') }} style={{
+                display: 'flex', alignItems: 'center', gap: 10,
+                justifyContent: collapsed ? 'center' : 'flex-start',
+                padding: collapsed ? '12px' : '12px 14px', marginTop: 8,
+                background: 'none', border: 'none',
+                color: 'var(--text-secondary)', fontSize: 13, fontWeight: 500,
+                cursor: 'pointer', width: '100%', borderRadius: 10,
+                transition: 'all 0.2s', letterSpacing: '0.02em',
+                boxSizing: 'border-box'
+              }}
+              onMouseEnter={e => { e.currentTarget.style.background = '#fef2f2'; e.currentTarget.style.color = 'var(--error)' }}
+              onMouseLeave={e => { e.currentTarget.style.background = 'none'; e.currentTarget.style.color = 'var(--text-secondary)' }}
+              >
+                <LogOut size={16} strokeWidth={1.5} /> {!collapsed && 'Logout'}
+              </button>
+            </TipWrap>
           </>
+        ) : collapsed ? (
+          <TipWrap label="Sign In" show={collapsed}>
+            <button onClick={() => navigate('/login')} style={{
+              width: '100%', padding: '10px', borderRadius: 10,
+              border: '1px solid var(--border)', background: 'var(--bg-card)',
+              color: 'var(--text-secondary)', cursor: 'pointer',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              boxSizing: 'border-box'
+            }}>
+              <LogIn size={14} />
+            </button>
+          </TipWrap>
         ) : (
           <div style={{ display: 'flex', gap: 8 }}>
             <button onClick={() => navigate('/login')} style={{
@@ -209,10 +299,12 @@ export default function Layout({ children }) {
     <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--bg-secondary)' }}>
       {/* Desktop Sidebar */}
       <aside style={{
-        width: 250, background: 'var(--sidebar-bg)',
-        borderRight: '1px solid var(--sidebar-border)',
+        width: SIDEBAR_WIDTH, background: 'var(--sidebar-bg)',
+        borderRight: '0.2px solid var(--sidebar-border)',
         display: 'flex', flexDirection: 'column',
-        position: 'fixed', top: 0, left: 0, bottom: 0, zIndex: 50
+        position: 'fixed', top: 0, left: 0, bottom: 0, zIndex: 50,
+        transition: 'width 0.2s ease',
+        boxSizing: 'border-box'
       }} className="sidebar-desktop">
         <SidebarContent />
       </aside>
@@ -238,7 +330,7 @@ export default function Layout({ children }) {
 
       {/* Mobile Overlay */}
       {open && <div onClick={() => setOpen(false)} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.3)', backdropFilter: 'blur(2px)', zIndex: 55 }} />}
-      
+
       {/* Mobile Drawer */}
       <aside style={{
         position: 'fixed', top: 56, left: 0, bottom: 0, width: 250,
@@ -251,13 +343,13 @@ export default function Layout({ children }) {
 
       {/* Main Content */}
       <main style={{
-        marginLeft: 250, flex: 1,
+        marginLeft: SIDEBAR_WIDTH, flex: 1,
         padding: '36px 40px 40px',
         minHeight: '100vh',
-        maxWidth: 'calc(100vw - 250px)',
+        maxWidth: `calc(100vw - ${SIDEBAR_WIDTH}px)`,
         boxSizing: 'border-box',
         background: 'var(--bg-secondary)',
-        transition: 'background 0.25s ease',
+        transition: 'margin-left 0.2s ease, max-width 0.2s ease, background 0.25s ease',
       }} className="main-content">
         {children}
       </main>

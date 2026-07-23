@@ -69,10 +69,10 @@ export default function SignupPage() {
             {/* Name + Email row */}
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
               <Field label="Full Name *">
-                <input className="legal-input" style={{ fontSize: 14 }} value={form.name} onChange={set('name')} placeholder="Adv. Ravi Kumar" disabled={loading} autoFocus />
+                <input className="legal-input" style={{ fontSize: 14 }} value={form.name} onChange={set('name')} placeholder="Adv. Orange Kumar" disabled={loading} autoFocus />
               </Field>
               <Field label="Email *">
-                <input type="email" className="legal-input" style={{ fontSize: 14 }} value={form.email} onChange={set('email')} placeholder="ravi@example.com" disabled={loading} />
+                <input type="email" className="legal-input" style={{ fontSize: 14 }} value={form.email} onChange={set('email')} placeholder="orange@example.com" disabled={loading} />
               </Field>
             </div>
 
@@ -94,15 +94,15 @@ export default function SignupPage() {
             {/* Bar + Court row */}
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
               <Field label="Bar Council No.">
-                <input className="legal-input" style={{ fontSize: 14 }} value={form.bar_number} onChange={set('bar_number')} placeholder="TN/1234/2020" disabled={loading} />
+                <input className="legal-input" style={{ fontSize: 14 }} value={form.bar_number} onChange={set('bar_number')} placeholder="TN/1234/2026" disabled={loading} />
               </Field>
               <Field label="Court / District">
-                <input className="legal-input" style={{ fontSize: 14 }} value={form.court} onChange={set('court')} placeholder="Krishnagiri District" disabled={loading} />
+                <input className="legal-input" style={{ fontSize: 14 }} value={form.court} onChange={set('court')} placeholder=" District" disabled={loading} />
               </Field>
             </div>
 
             <Field label="Phone (optional)">
-              <input className="legal-input" style={{ fontSize: 14 }} value={form.phone} onChange={set('phone')} placeholder="+91 99521 20941" disabled={loading} />
+              <input className="legal-input" style={{ fontSize: 14 }} value={form.phone} onChange={set('phone')} placeholder="+91 9383736353" disabled={loading} />
             </Field>
 
             {/* Benefits */}
