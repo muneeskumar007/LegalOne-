@@ -11,6 +11,10 @@ from fastapi.middleware.cors import CORSMiddleware
 from routers import extract, classify, draft, validate, compare, arguments, export, bare_acts
 from routers import auth_router, history
 
+# main.py  — add these two lines alongside your bare_acts router
+
+from routers import judgements   # add this
+
 
  
 
@@ -62,6 +66,9 @@ app.include_router(rag_status_router, prefix="/api", tags=["RAG Status"])
 
 # NEW — Master Drafter routes (3-step AI flow)
 app.include_router(drafter_router,    prefix="/api", tags=["AI Drafter"])
+
+# judgement pdf download from router
+app.include_router(judgements.router)  # add this
 
  
 
