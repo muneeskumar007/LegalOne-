@@ -68,7 +68,7 @@ app.include_router(rag_status_router, prefix="/api", tags=["RAG Status"])
 app.include_router(drafter_router,    prefix="/api", tags=["AI Drafter"])
 
 # judgement pdf download from router
-app.include_router(judgements.router)  # add this
+app.include_router(judgements.router, prefix="/api", tags=["Judgements"])
 
  
 
