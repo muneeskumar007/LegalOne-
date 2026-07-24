@@ -10,6 +10,7 @@ import LoginPage     from './pages/LoginPage'
 import SignupPage    from './pages/SignupPage'
 import ProfilePage   from './pages/ProfilePage'
 import JudgementsDashboard from './pages/JudgementsDashboard'
+import JudgementUI from './pages/JudgementUI'
 import MyCasesPage   from './pages/Mycases'
 import RagStatusPage from './pages/RagStatusPage'
 
@@ -31,6 +32,7 @@ export default function App() {
             
             <Route path="/reference" element={<ReferencePage />}/>
             <Route path="/my-cases"  element={<MyCasesPage />} />
+            <Route path="/judgements" element={<JudgementUI />} />
 
 <Route path="/rag" element={<RagStatusPage />} />
 
