@@ -32,7 +32,8 @@ export default function App() {
             
             <Route path="/reference" element={<ReferencePage />}/>
             <Route path="/my-cases"  element={<MyCasesPage />} />
-            <Route path="/judgements" element={<JudgementUI />} />
+            <Route path="/judgements"  element={<JudgementsDashboard />} />
+
 
 <Route path="/rag" element={<RagStatusPage />} />
 

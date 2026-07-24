@@ -25,7 +25,7 @@ const ACTS = [
   },
   {
     name: 'Indian Evidence Act, 1872 / BSA 2023', short: 'IEA/BSA',
-    color: 'rgba(212,168,67,0.1)', textColor: 'var(--gold)',
+    color: 'rgba(212,168,67,0.1)', textColor: '#92722a',
     sections: [
       { sec: 'Section 101', desc: 'Burden of proof — whoever asserts must prove' },
       { sec: 'Section 102', desc: 'Burden lies on party who would fail without evidence' },
@@ -62,7 +62,7 @@ const ACTS = [
   },
   {
     name: 'Bharatiya Nyaya Sanhita, 2023', short: 'BNS',
-    color: 'rgba(212,168,67,0.08)', textColor: 'var(--gold)',
+    color: 'rgba(212,168,67,0.08)', textColor: '#92722a',
     sections: [
       { sec: 'Section 85',  desc: 'Cruelty by husband or relative of husband' },
       { sec: 'Section 115', desc: 'Voluntarily causing hurt' },
@@ -72,7 +72,7 @@ const ACTS = [
   },
   {
     name: 'Consumer Protection Act, 2019', short: 'CPA',
-    color: 'rgba(74,222,128,0.08)', textColor: 'var(--success)',
+    // color: 'rgba(74,222,128,0.08)', textColor: 'var(--success)',
     sections: [
       { sec: 'Section 2(7)', desc: 'Definition of "consumer"' },
       { sec: 'Section 34',   desc: 'Jurisdiction of District Commission' },
@@ -146,7 +146,7 @@ export default function ReferencePage() {
                 background: act.color, color: act.textColor,
                 fontFamily: 'JetBrains Mono, monospace', letterSpacing: '0.05em'
               }}>{act.short}</span>
-              <span style={{ fontSize: 12, fontWeight: 500, color: 'var(--text-primary)', lineHeight: 1.3 }}>{act.name}</span>
+              <span style={{ fontSize: 12, fontWeight: 500, color: '#1f2937', lineHeight: 1.3 }}>{act.name}</span>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
               {act.sections.map((s, j) => (

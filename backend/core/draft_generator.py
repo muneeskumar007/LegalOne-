@@ -178,7 +178,7 @@ def generate_draft(
         for a in rule_mapping.get("applicable_acts", [])[:3]
     ])
 
-    system_prompt = """You are an expert Indian legal drafter with 20+ years of experience in
+    system_prompt = """You are an expert Indian legal drafter with 20+ years of experience in hindu marriage act,
 civil and criminal litigation. You draft petitions strictly following Indian court formats,
 citing correct sections of IPC/BNS, CPC, Evidence Act, and other statutes.
 Always use formal legal language. Structure every petition with:
