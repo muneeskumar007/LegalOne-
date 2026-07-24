@@ -8,7 +8,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 # Existing routers
-from routers import extract, classify, draft, validate, compare, arguments, export
+from routers import extract, classify, draft, validate, compare, arguments, export, bare_acts
 from routers import auth_router, history
 
 
@@ -49,6 +49,7 @@ app.include_router(validate.router,      prefix="/api", tags=["Validation"])
 app.include_router(compare.router,       prefix="/api", tags=["Comparison"])
 app.include_router(arguments.router,     prefix="/api", tags=["Argument Writer"])
 app.include_router(export.router,        prefix="/api", tags=["Export"])
+app.include_router(bare_acts.router,     prefix="/api", tags=["Bare Acts"])
 
 # Auth routes
 app.include_router(auth_router.router,   prefix="/api", tags=["Authentication"])
