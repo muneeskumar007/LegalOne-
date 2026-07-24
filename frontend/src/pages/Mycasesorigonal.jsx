@@ -1,4 +1,4 @@
-// '''import { useState, useEffect, useCallback } from 'react'
+// import { useState, useEffect, useCallback } from 'react'
 // import { useNavigate } from 'react-router-dom'
 // import {
 //   FileText, Star, StarOff, Trash2, Eye, Search,
@@ -901,14 +901,11 @@
 
 
 
-
-
 import { useState, useEffect, useCallback, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
   CircleHelp, Moon, Plus, Sun, UserRound,
   Award, FileCheck2, Scale, Sparkles, Gavel,
-  Star, StarOff, Trash2, Clock, Copy, Download, X,
 } from 'lucide-react'
 import { motion } from 'framer-motion'
 
@@ -919,6 +916,8 @@ import CategoryTabs   from '../components/judgements/CategoryTabs'
 import SearchToolbar  from '../components/judgements/SearchToolbar'
 import JudgementTable from '../components/judgements/JudgementTable'
 import Pagination     from '../components/judgements/Pagination'
+
+ 
 
 /* ─────────────────────────────────────────────────────────────────────
  * Route your "New Draft" button goes to. Confirmed from your working
@@ -986,28 +985,10 @@ function parseNotes(notesStr) {
   try { return JSON.parse(notesStr || '{}') } catch { return {} }
 }
 
-function fmt(isoStr) {
-  if (!isoStr) return '—'
-  const d = new Date(isoStr)
-  return d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })
-    + ', ' + d.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })
-}
-
-function capitalize(str) {
-  if (!str) return str
-  return str.charAt(0).toUpperCase() + str.slice(1)
-}
-
-function capitalizeWords(str) {
-  if (!str) return str
-  return str.split(' ').map(capitalize).join(' ')
-}
-
 // NOTE: your backend doesn't return an explicit "case type" field in the
-// history payload shown in MyCasesPage.jsx, so this infers the broad
-// category (used for tabs/filters) from what IS available (notes.ground,
-// module, title keywords). Swap this out for a real `item.case_type` field
-// if/when your API returns one directly.
+// history payload shown in MyCasesPage.jsx, so this infers it from what IS
+// available (notes.ground, module, title keywords). Swap this out for a
+// real `item.case_type` field if/when your API returns one directly.
 function getCaseType(item) {
   const notes = parseNotes(item.notes)
   const hay = `${item.title || ''} ${notes.ground || ''} ${item.draft_source || ''}`.toLowerCase()
@@ -1016,56 +997,6 @@ function getCaseType(item) {
   if (hay.includes('petition'))  return 'petition'
   if (hay.includes('affidavit')) return 'affidavit'
   return 'other'
-}
-
-// More specific label for the coloured Case Type chip in the table
-// (e.g. a divorce case can be filed as a "Petition" or a "Counter"
-// statement — the chip shows that specific sub-type, the caption
-// underneath shows the broad category from getCaseType()).
-function getCaseTypeChip(item) {
-  const notes = parseNotes(item.notes)
-  const hay = `${item.title || ''} ${notes.ground || ''} ${item.draft_source || ''}`.toLowerCase()
-  if (hay.includes('counter'))      return 'Counter'
-  if (hay.includes('argument'))     return 'Arguments'
-  if (hay.includes('notice'))       return 'Legal Notice'
-  if (hay.includes('affidavit'))    return 'Affidavit'
-  if (hay.includes('petition') || hay.includes('divorce') || notes.ground) return 'Petition'
-  return 'Other'
-}
-
-function buildParties(item) {
-  if (item.plaintiff_name && item.defendant_name) return `${item.plaintiff_name} vs ${item.defendant_name}`
-  if (item.plaintiff_name) return item.plaintiff_name
-  if (item.defendant_name) return item.defendant_name
-  return undefined
-}
-
-// Maps a raw API judgement object onto the field names TableRow.jsx
-// actually expects (caseType, caseCategory, caseNumber, status,
-// lastModified, parties). The original raw item is kept as `_raw` so
-// handlers (view/share) can still reach fields not shown in the table
-// (draft_text, notes, plaintiff/defendant names, etc.).
-function mapJudgementRow(item) {
-  const notes = parseNotes(item.notes)
-  return {
-    id: item.id,
-    title: item.title,
-    parties: buildParties(item),
-    caseType: getCaseTypeChip(item),
-    caseCategory: capitalize(getCaseType(item)),
-    caseNumber: item.case_number || notes.case_number,
-    status: capitalizeWords(item.status || 'draft'),
-    lastModified: fmt(item.updated_at || item.created_at),
-    _raw: item,
-  }
-}
-
-function getScoreQualifier(value) {
-  if (value === undefined) return { label: '—', accent: 'blue' }
-  if (value >= 85) return { label: 'Excellent',   accent: 'emerald' }
-  if (value >= 70) return { label: 'Good',        accent: 'blue'    }
-  if (value >= 50) return { label: 'Fair',        accent: 'amber'   }
-  return { label: 'Needs Work', accent: 'rose' }
 }
 
 function withinModifiedRange(isoStr, range) {
@@ -1080,245 +1011,12 @@ function withinModifiedRange(isoStr, range) {
   return true
 }
 
-/* ─── Score badge (used inside the detail drawer) ──────────────────── */
-function ScoreBadge({ value, label, color }) {
-  const clr = color || (value >= 80 ? '#16a34a' : value >= 50 ? '#d97706' : '#dc2626')
-  const bg  = color ? `${color}18` : (value >= 80 ? '#dcfce7' : value >= 50 ? '#fef3c7' : '#fee2e2')
-  return (
-    <div style={{
-      display: 'flex', flexDirection: 'column', alignItems: 'center',
-      padding: '10px 16px', borderRadius: 10,
-      background: bg, border: `1px solid ${clr}30`, minWidth: 80,
-    }}>
-      <span style={{ fontSize: 20, fontWeight: 800, color: clr, lineHeight: 1 }}>{value}%</span>
-      <span style={{ fontSize: 10.5, color: clr, marginTop: 3, fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.4 }}>{label}</span>
-    </div>
-  )
-}
-
-function SourceBadge({ source }) {
-  const isAI = source && source.includes('ollama')
-  return (
-    <span style={{
-      display: 'inline-flex', alignItems: 'center', gap: 4,
-      padding: '2px 8px', borderRadius: 20,
-      background: isAI ? '#eff6ff' : '#f8fafc',
-      border: `1px solid ${isAI ? '#bfdbfe' : '#e2e8f0'}`,
-      color: isAI ? '#1d4ed8' : '#64748b',
-      fontSize: 10.5, fontWeight: 600,
-    }}>
-      {isAI ? '🤖 AI Generated' : '📋 Template'}
-    </span>
-  )
-}
-
-/* ─── Detail Drawer — opened by the eye/View button ────────────────── */
-function DetailDrawer({ item, onClose, onStar, onDelete, authApi }) {
-  const notes = parseNotes(item?.notes)
-  const [copied, setCopied] = useState(false)
-  const [downloading, setDownloading] = useState(false)
-
-  const handleCopy = () => {
-    navigator.clipboard.writeText(item.draft_text || '').then(() => {
-      setCopied(true)
-      setTimeout(() => setCopied(false), 1500)
-    })
-  }
-
-  const handleDownload = async () => {
-    if (!item.draft_text || downloading) return
-    setDownloading(true)
-    try {
-      const res = await authApi.post(
-        '/export/docx',
-        {
-          draft_text: item.draft_text,
-          metadata: {
-            title: item.title,
-            case_type: getCaseTypeChip(item),
-            plaintiff_name: item.plaintiff_name,
-            defendant_name: item.defendant_name,
-            court: item.court,
-          },
-        },
-        { responseType: 'blob' }
-      )
-
-      const blob = new Blob([res.data], {
-        type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-      })
-      const url = URL.createObjectURL(blob)
-      const a = document.createElement('a')
-      a.href = url
-      a.download = `${item.title || 'petition'}.docx`
-      document.body.appendChild(a)
-      a.click()
-      a.remove()
-      URL.revokeObjectURL(url)
-    } catch (e) {
-      window.alert(e.response?.data?.detail || 'Failed to generate document')
-    } finally {
-      setDownloading(false)
-    }
-  }
-  if (!item) return null
-
-  return (
-    <>
-      {/* Backdrop */}
-      <div onClick={onClose} style={{
-        position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.35)',
-        zIndex: 400, backdropFilter: 'blur(2px)',
-      }} />
-      {/* Drawer */}
-      <div style={{
-        position: 'fixed', top: 0, right: 0, bottom: 0,
-        width: Math.min(680, window.innerWidth - 40),
-        background: 'var(--bg-primary)',
-        borderLeft: '1px solid var(--border)',
-        boxShadow: '-8px 0 32px rgba(0,0,0,0.12)',
-        zIndex: 401, display: 'flex', flexDirection: 'column',
-        animation: 'slideIn 0.22s ease',
-      }}>
-        {/* Header */}
-        <div style={{
-          padding: '18px 22px', borderBottom: '1px solid var(--border)',
-          display: 'flex', alignItems: 'flex-start', gap: 12,
-        }}>
-          <button onClick={onClose} style={{
-            background: 'none', border: 'none', cursor: 'pointer',
-            color: 'var(--text-muted)', padding: 4, borderRadius: 6, marginTop: 2,
-          }}>
-            <X size={18} />
-          </button>
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-primary)', lineHeight: 1.3 }}>
-              {item.title}
-            </div>
-            <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 4, display: 'flex', alignItems: 'center', gap: 10 }}>
-              <Clock size={11} /> {fmt(item.created_at)}
-              <SourceBadge source={item.draft_source} />
-            </div>
-          </div>
-          <div style={{ display: 'flex', gap: 6 }}>
-            <button onClick={handleCopy} title="Copy draft" style={{
-              background: 'var(--bg-card)', border: '1px solid var(--border)',
-              borderRadius: 8, padding: '7px 10px', cursor: 'pointer',
-              color: copied ? '#16a34a' : 'var(--text-secondary)', fontSize: 12,
-              display: 'flex', alignItems: 'center', gap: 5, fontWeight: 500,
-            }}>
-              <Copy size={13} /> {copied ? 'Copied!' : 'Copy'}
-            </button>
-            <button onClick={handleDownload} disabled={downloading} title="Download" style={{
-  background: 'var(--bg-card)', border: '1px solid var(--border)',
-  borderRadius: 8, padding: '7px 10px', cursor: downloading ? 'default' : 'pointer',
-  color: 'var(--text-secondary)', fontSize: 12,
-  display: 'flex', alignItems: 'center', gap: 5, fontWeight: 500,
-  opacity: downloading ? 0.6 : 1,
-}}>
-  <Download size={13} /> {downloading ? 'Generating…' : 'Download'}
-</button>
-          </div>
-        </div>
-
-        {/* Score strip */}
-        <div style={{
-          padding: '14px 22px', borderBottom: '1px solid var(--border)',
-          display: 'flex', gap: 10, flexWrap: 'wrap',
-        }}>
-          <ScoreBadge value={notes.completeness_score ?? item.validation_score ?? 0} label="Completeness" />
-          <ScoreBadge value={notes.legal_accuracy ?? item.validation_score ?? 0} label="Legal Accuracy" />
-          <div style={{
-            display: 'flex', flexDirection: 'column', alignItems: 'center',
-            padding: '10px 16px', borderRadius: 10,
-            background: 'var(--bg-card)', border: '1px solid var(--border)', minWidth: 80,
-          }}>
-            <span style={{ fontSize: 20, fontWeight: 800, color: 'var(--text-primary)', lineHeight: 1 }}>
-              {notes.word_count ?? '—'}
-            </span>
-            <span style={{ fontSize: 10.5, color: 'var(--text-muted)', marginTop: 3, fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.4 }}>Words</span>
-          </div>
-          {notes.ground && (
-            <div style={{
-              display: 'flex', flexDirection: 'column', alignItems: 'center',
-              padding: '10px 16px', borderRadius: 10,
-              background: '#faf5ff', border: '1px solid #e9d5ff', minWidth: 80,
-            }}>
-              <span style={{ fontSize: 13, fontWeight: 700, color: '#7c3aed', lineHeight: 1, textTransform: 'capitalize' }}>
-                {notes.ground}
-              </span>
-              <span style={{ fontSize: 10.5, color: '#7c3aed', marginTop: 3, fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.4 }}>Ground</span>
-            </div>
-          )}
-        </div>
-
-        {/* Meta info */}
-        <div style={{ padding: '12px 22px', borderBottom: '1px solid var(--border)', display: 'flex', gap: 20, flexWrap: 'wrap' }}>
-          {item.plaintiff_name && (
-            <div>
-              <div style={{ fontSize: 10, color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.5 }}>Petitioner</div>
-              <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)', marginTop: 2 }}>{item.plaintiff_name}</div>
-            </div>
-          )}
-          {item.defendant_name && (
-            <div>
-              <div style={{ fontSize: 10, color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.5 }}>Respondent</div>
-              <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)', marginTop: 2 }}>{item.defendant_name}</div>
-            </div>
-          )}
-          {item.court && (
-            <div>
-              <div style={{ fontSize: 10, color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.5 }}>Court</div>
-              <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)', marginTop: 2 }}>{item.court}</div>
-            </div>
-          )}
-        </div>
-
-        {/* Draft text */}
-        <div style={{ flex: 1, overflowY: 'auto', padding: '18px 22px' }}>
-          <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: 0.6, marginBottom: 10 }}>
-            Generated Draft
-          </div>
-          <pre style={{
-            fontFamily: "'Courier New', monospace", fontSize: 12.5,
-            color: 'var(--text-primary)', lineHeight: 1.7,
-            whiteSpace: 'pre-wrap', wordBreak: 'break-word',
-            background: 'var(--bg-card)', border: '1px solid var(--border)',
-            borderRadius: 10, padding: '16px 18px', margin: 0,
-          }}>
-            {item.draft_text || 'No draft text available.'}
-          </pre>
-        </div>
-
-        {/* Footer actions */}
-        <div style={{
-          padding: '12px 22px', borderTop: '1px solid var(--border)',
-          display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-        }}>
-          <button onClick={() => onStar(item)} style={{
-            background: 'none', border: '1px solid var(--border)', borderRadius: 8,
-            padding: '8px 14px', cursor: 'pointer',
-            color: item.is_starred ? '#d97706' : 'var(--text-secondary)',
-            display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, fontWeight: 500,
-          }}>
-            {item.is_starred ? <Star size={14} fill="#d97706" /> : <StarOff size={14} />}
-            {item.is_starred ? 'Starred' : 'Add Star'}
-          </button>
-          <button
-            onClick={async () => { await onDelete(item); onClose() }}
-            style={{
-              background: 'none', border: '1px solid rgba(239,68,68,0.3)', borderRadius: 8,
-              padding: '8px 14px', cursor: 'pointer',
-              color: '#dc2626', display: 'flex', alignItems: 'center', gap: 6,
-              fontSize: 13, fontWeight: 500,
-            }}
-          >
-            <Trash2 size={14} /> Delete Draft
-          </button>
-        </div>
-      </div>
-    </>
-  )
+// Grayscale "quality" shade — replaces the old blue/green/amber/red palette
+// so score badges/bars stay legible in a pure black & white theme.
+function monoShade(value) {
+  if (value >= 80) return '#111111'
+  if (value >= 50) return '#555555'
+  return '#999999'
 }
 
 /* ─── Component ─────────────────────────────────────────────────────── */
@@ -1335,14 +1033,11 @@ export default function JudgementsDashboard() {
   const [page,         setPage]         = useState(1)
   const pageSize = 6
 
-  /* Real data state */
+  /* Real data state (was hardcoded/empty before) */
   const [judgements, setJudgements] = useState([])
   const [loading,    setLoading]    = useState(true)
   const [error,      setError]      = useState('')
   const [statsRaw,   setStatsRaw]   = useState(null)
-
-  /* Drawer state — opened by the eye/View button */
-  const [selectedCase, setSelectedCase] = useState(null)
 
   /* ── Load cases + stats from the real API (same endpoints as MyCasesPage.jsx) ── */
   const load = useCallback(async () => {
@@ -1367,12 +1062,11 @@ export default function JudgementsDashboard() {
   /* ── Reset to page 1 whenever the filtered set would change ── */
   useEffect(() => { setPage(1) }, [activeTab, search, filterValues])
 
-  /* ── Real handlers ── */
+  /* ── Real handlers (replacing the old no-ops) ── */
   async function handleStar(judgement) {
     try {
       await authApi.put(`/history/${judgement.id}`, { is_starred: !judgement.is_starred })
       setJudgements((prev) => prev.map((c) => (c.id === judgement.id ? { ...c, is_starred: !c.is_starred } : c)))
-      setSelectedCase((prev) => (prev && prev.id === judgement.id ? { ...prev, is_starred: !prev.is_starred } : prev))
     } catch { /* silent, same as MyCasesPage.jsx */ }
   }
 
@@ -1385,10 +1079,11 @@ export default function JudgementsDashboard() {
     } catch { /* silent */ }
   }
 
-  // Eye button — opens the inline drawer to preview the draft, instead of
-  // navigating away (restored from the old working theme).
   function handleView(judgement) {
-    setSelectedCase(judgement._raw || judgement)
+    // Adjust this route if your detail page differs — reusing the /draft
+    // route with the record id in state, since that's the confirmed
+    // working navigation target in your app.
+    navigate(NEW_DRAFT_ROUTE, { state: { viewId: judgement.id } })
   }
 
   function handleContinue(judgement) {
@@ -1400,9 +1095,8 @@ export default function JudgementsDashboard() {
   }
 
   async function handleShare(judgement) {
-    const raw = judgement._raw || judgement
     try {
-      await navigator.clipboard.writeText(raw.draft_text || raw.title || '')
+      await navigator.clipboard.writeText(judgement.draft_text || judgement.title || '')
       // no toast system provided in the source files — swap for your own if you have one
       window.alert('Draft copied to clipboard.')
     } catch { /* silent */ }
@@ -1434,15 +1128,6 @@ export default function JudgementsDashboard() {
   const totalPages   = Math.max(1, Math.ceil(totalRecords / pageSize))
   const pagedJudgements = filteredJudgements.slice((page - 1) * pageSize, page * pageSize)
 
-  // Rows in the exact shape TableRow.jsx expects (caseType, caseCategory,
-  // caseNumber, status, lastModified, parties) — this is what was
-  // producing blank columns before, since raw API objects were passed
-  // straight through.
-  const tableRows = useMemo(
-    () => pagedJudgements.map(mapJudgementRow),
-    [pagedJudgements]
-  )
-
   /* ── Aggregate stat cards from real case data ──
    * NOTE: your /history/stats endpoint returns {total, starred, modules},
    * not per-case Score/Completeness/Legal Accuracy/Clarity/Court Readiness.
@@ -1457,15 +1142,13 @@ export default function JudgementsDashboard() {
       if (!vals.length) return undefined
       return Math.round(vals.reduce((a, b) => a + b, 0) / vals.length)
     }
-    const scoreVal  = avg((n, i) => judgements[i]?.validation_score)
-    const scoreMeta = getScoreQualifier(scoreVal)
     return [
-      { title: 'Score',          description: scoreMeta.label,             icon: Award,      value: scoreVal, accent: scoreMeta.accent, variant: 'score' },
-      { title: 'Completeness',   description: 'Required case details',     icon: FileCheck2, value: avg((n) => n.completeness_score), accent: 'emerald' },
-      { title: 'Legal Accuracy', description: 'Legal reasoning review',    icon: Scale,      value: avg((n) => n.legal_accuracy),      accent: 'blue'    },
-      { title: 'Clarity',        description: 'Language & structure',      icon: Sparkles,   value: undefined,                          accent: 'amber'   },
-      { title: 'Court Readiness',description: 'Filing preparedness',       icon: Gavel,      value: undefined,                          accent: 'violet'  },
-    ]
+      { title: 'Score',          description: 'Overall draft assessment', icon: Award,      value: avg((n, i) => judgements[i]?.validation_score) },
+      { title: 'Completeness',   description: 'Required case details',    icon: FileCheck2,  value: avg((n) => n.completeness_score) },
+      { title: 'Legal Accuracy', description: 'Legal reasoning review',   icon: Scale,       value: avg((n) => n.legal_accuracy) },
+      { title: 'Clarity',        description: 'Language & structure',     icon: Sparkles,    value: undefined },
+      { title: 'Court Readiness',description: 'Filing preparedness',      icon: Gavel,       value: undefined },
+    ].map((s) => ({ ...s, accent: 'mono' }))
   }, [judgements, statsRaw])
 
   const filtersWithValues = FILTERS_CONFIG_BASE.map((f) => ({
@@ -1547,11 +1230,10 @@ export default function JudgementsDashboard() {
           <motion.div key={stat.title} variants={fadeUp}>
             <StatCard
               title={stat.title}
-              value={stat.variant === 'score' ? stat.value : (stat.value !== undefined ? `${stat.value}%` : undefined)}
+              value={stat.value !== undefined ? `${stat.value}%` : undefined}
               icon={stat.icon}
               description={stat.description}
               accent={stat.accent}
-              variant={stat.variant}
               loading={loading}
             />
           </motion.div>
@@ -1601,7 +1283,7 @@ export default function JudgementsDashboard() {
         />
 
         <JudgementTable
-          judgements={tableRows}
+          judgements={pagedJudgements}
           loading={loading}
           onView={handleView}
           onContinue={handleContinue}
@@ -1618,17 +1300,6 @@ export default function JudgementsDashboard() {
           onPageChange={setPage}
         />
       </motion.section>
-
-      {/* ── Detail Drawer — opened by the eye/View button ─────────────── */}
-      {selectedCase && (
-  <DetailDrawer
-    item={selectedCase}
-    onClose={() => setSelectedCase(null)}
-    onStar={handleStar}
-    onDelete={handleDelete}
-    authApi={authApi}
-  />
-)}
     </section>
   )
 }

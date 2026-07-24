@@ -5,12 +5,9 @@
 @tailwind utilities;
 
 /* ═══════════════════════════════════════════════════════
-   LegalOne AI — Design System
+   LegalOne AI — Black & White Design System
    ═══════════════════════════════════════════════════════ */
 
-
-
-   
 :root {
   --bg-primary:    #ffffff;
   --bg-secondary:  #fafafa;
@@ -95,7 +92,7 @@ body {
 ::-webkit-scrollbar-thumb:hover { background: #a3a3a3; }
 ::selection { background: rgba(10,10,10,0.12); color: var(--text-primary); }
 
-/* ── Typography Shimmer ── */
+/* ── Typography Shimmer (now monochrome) ── */
 .gold-shimmer {
   background: linear-gradient(90deg, #0a0a0a 0%, #525252 50%, #0a0a0a 100%);
   background-size: 200% 100%;
@@ -105,7 +102,7 @@ body {
   animation: shimmer 3s infinite;
 }
 
-/* ── Glass Card ── */
+/* ── Glass Card (now clean white) ── */
 .glass-card {
   background: #ffffff;
   border: 1px solid var(--border);
@@ -359,84 +356,84 @@ body {
   margin-bottom: 28px;
 }
 
-/* Base stat card — compact horizontal layout (icon + label/value) */
+/* Base stat card */
 .jd-stat-card {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 14px 16px;
+  position: relative;
+  min-height: 156px;
+  padding: 20px;
+  overflow: hidden;
   border: 1px solid #e3eaf5;
-  border-radius: 12px;
+  border-radius: 14px;
   background: #fff;
-  box-shadow: 0 1px 3px rgba(28, 44, 84, .04);
+  box-shadow: 0 2px 10px rgba(28, 44, 84, .04), 0 1px 3px rgba(0,0,0,.03);
   transition: box-shadow .2s, transform .2s;
 }
+/* Decorative circle blob */
+.jd-sc-deco {
+  position: absolute;
+  right: -18px;
+  bottom: -22px;
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  pointer-events: none;
+}
 
-/* Stat icon — round badge */
+/* Stat card accent variants */
+.jd-sc--blue   { border-top: 3px solid #3b6de8; }
+.jd-sc--indigo { border-top: 3px solid #6366f1; }
+.jd-sc--violet { border-top: 3px solid #8b5cf6; }
+.jd-sc--emerald{ border-top: 3px solid #10b981; }
+.jd-sc--amber  { border-top: 3px solid #f59e0b; }
+
+.jd-sc--blue   .jd-sc-deco { background: rgba(59, 109, 232, .07); }
+.jd-sc--indigo .jd-sc-deco { background: rgba(99, 102, 241, .07); }
+.jd-sc--violet .jd-sc-deco { background: rgba(139, 92, 246, .07); }
+.jd-sc--emerald.jd-sc-deco { background: rgba(16, 185, 129, .07); }
+.jd-sc--amber  .jd-sc-deco { background: rgba(245, 158, 11, .07); }
+
+/* Stat icon */
 .jd-stat-icon {
   display: inline-grid;
-  width: 40px;
-  height: 40px;
-  flex-shrink: 0;
+  width: 38px;
+  height: 38px;
   place-items: center;
-  border-radius: 50%;
+  border-radius: 10px;
 }
 .jd-sc-icon--blue    { background: #ebf0fd; color: #2e5eda; }
 .jd-sc-icon--indigo  { background: #eeeffd; color: #5154d6; }
 .jd-sc-icon--violet  { background: #f3eefe; color: #7c3aed; }
 .jd-sc-icon--emerald { background: #e8f8f2; color: #059669; }
 .jd-sc-icon--amber   { background: #fef8e7; color: #d97706; }
-.jd-sc-icon--rose    { background: #fef2f2; color: #dc2626; }
 
-/* Score ring — circular outline showing the raw number instead of an icon */
-.jd-stat-ring {
-  display: inline-grid;
-  width: 40px;
-  height: 40px;
-  flex-shrink: 0;
-  place-items: center;
-  border-radius: 50%;
-  border: 2px solid currentColor;
-  background: #fff;
-  font-size: 13px;
-  font-weight: 800;
-}
-.jd-ring--blue    { color: #2e5eda; }
-.jd-ring--indigo  { color: #5154d6; }
-.jd-ring--violet  { color: #7c3aed; }
-.jd-ring--emerald { color: #059669; }
-.jd-ring--amber   { color: #d97706; }
-.jd-ring--rose    { color: #dc2626; }
-
-.jd-stat-text {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-}
 .jd-stat-title {
-  color: #384558;
-  font-size: 12.5px;
+  margin: 14px 0 3px;
+  color: #64748b;
+  font-size: 11.5px;
   font-weight: 600;
-  line-height: 1.3;
+  text-transform: uppercase;
+  letter-spacing: .04em;
 }
 .jd-stat-value {
-  margin-top: 2px;
+  margin: 0;
   color: #0f1b2d;
-  font-size: 15px;
-  font-weight: 700;
-  line-height: 1.25;
-  letter-spacing: -.01em;
+  font-size: 28px;
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: -.02em;
 }
-.jd-stat-qualifier {
-  margin-top: 2px;
-  font-size: 12.5px;
-  font-weight: 700;
-  line-height: 1.25;
+.jd-stat-description {
+  position: relative;
+  z-index: 1;
+  margin: 6px 0 0;
+  color: #94a3b8;
+  font-size: 11px;
 }
 
 /* Skeleton inside stat card */
-.jd-sc-skel-title  { height: 10px; width: 70%; }
-.jd-sc-skel-value  { height: 14px; width: 45%; margin-top: 8px; }
+.jd-sc-skel-title  { height: 11px; width: 60%; margin-top: 16px; }
+.jd-sc-skel-value  { height: 26px; width: 45%; margin-top: 8px; }
+.jd-sc-skel-desc   { height: 10px; width: 75%; margin-top: 8px; }
 
 /* ── Cases section card ─────────────────────────────────── */
 .jd-cases-section {
@@ -487,20 +484,6 @@ body {
   background: linear-gradient(135deg, #263f80 0%, #162d5c 100%);
   box-shadow: 0 6px 20px rgba(30, 58, 114, .3);
 }
-
-.jd-secondary-button {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 9px 16px;
-  border: 1px solid #dde6f5;
-  border-radius: 9px;
-  background: #fff;
-  color: #3d5378;
-  font: 600 13px/1 Inter, 'DM Sans', sans-serif;
-  cursor: pointer;
-}
-.jd-secondary-button:hover { border-color: #a8bed8; color: #2a4d9b; }
 
 /* ── Category tabs ──────────────────────────────────────── */
 .jd-tabs {
@@ -690,14 +673,6 @@ body {
   font-size: 11.5px;
   font-weight: 600;
 }
-/* Case type colour variants — matches the coloured type pills in the reference design */
-.jd-td-chip--divorce   { background: #eef3fd; color: #2a4d9b; }
-.jd-td-chip--notice    { background: #fff7ed; color: #c2620a; }
-.jd-td-chip--petition  { background: #f5eefe; color: #7c3aed; }
-.jd-td-chip--affidavit { background: #ecfeff; color: #0e7490; }
-.jd-td-chip--counter   { background: #eff6ff; color: #2563eb; }
-.jd-td-chip--arguments { background: #fdf2f8; color: #db2777; }
-
 .jd-td-mono {
   font-family: 'JetBrains Mono', ui-monospace, monospace;
   font-size: 11.5px;
@@ -725,12 +700,12 @@ body {
 /* Variant colours */
 .jd-badge--draft       { background: #f1f4f9; color: #5a6e8c; }
 .jd-badge--draft       .jd-badge-dot { background: #8fa3bb; }
-.jd-badge--progress    { background: #ecfdf5; color: #059669; }
-.jd-badge--progress    .jd-badge-dot { background: #10b981; }
+.jd-badge--progress    { background: #eff6ff; color: #2563eb; }
+.jd-badge--progress    .jd-badge-dot { background: #3b82f6; }
 .jd-badge--review      { background: #fffbeb; color: #b45309; }
 .jd-badge--review      .jd-badge-dot { background: #f59e0b; }
-.jd-badge--completed   { background: #eff6ff; color: #2563eb; }
-.jd-badge--completed   .jd-badge-dot { background: #3b82f6; }
+.jd-badge--completed   { background: #ecfdf5; color: #059669; }
+.jd-badge--completed   .jd-badge-dot { background: #10b981; }
 .jd-badge--filed       { background: #f0fdf4; color: #16a34a; }
 .jd-badge--filed       .jd-badge-dot { background: #22c55e; }
 .jd-badge--rejected    { background: #fef2f2; color: #dc2626; }
@@ -739,15 +714,6 @@ body {
 .jd-badge--pending     .jd-badge-dot { background: #8b5cf6; }
 .jd-badge--default     { background: #f1f5fb; color: #5a6e8c; }
 .jd-badge--default     .jd-badge-dot { background: #8fa3bb; }
-
-/* Small caption under the status pill / type chip, e.g. "Drafting", "Divorce" */
-.jd-td-caption {
-  display: block;
-  margin-top: 4px;
-  color: #8a98ad;
-  font-size: 11px;
-  font-weight: 500;
-}
 
 /* ── Action Menu ────────────────────────────────────────── */
 .jd-actions {
@@ -949,39 +915,6 @@ body {
   user-select: none;
 }
 
-/* ── Sign-in gate (used when JudgementsDashboard renders logged-out state) ── */
-.jd-signin-gate {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 60px 20px;
-  min-height: 100vh;
-}
-.jd-signin-card {
-  text-align: center;
-  max-width: 380px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
-  color: #172033;
-}
-.jd-signin-card h2 { margin: 8px 0 0; font-size: 20px; }
-.jd-signin-card p  { color: #7a8ca0; font-size: 13px; line-height: 1.6; margin: 0 0 8px; }
-.jd-signin-actions { display: flex; gap: 10px; }
-
-/* ── Error banner ───────────────────────────────────────── */
-.jd-error-banner {
-  margin: 0 0 16px;
-  padding: 12px 16px;
-  border: 1px solid #fecaca;
-  border-left: 3px solid #dc2626;
-  border-radius: 8px;
-  background: #fef2f2;
-  color: #b91c1c;
-  font-size: 13px;
-}
-
 /* ── Responsive ─────────────────────────────────────────── */
 @media (max-width: 1200px) {
   .jd-stat-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
@@ -1012,6 +945,8 @@ body {
   .jd-pagination { flex-direction: column; align-items: flex-start; gap: 10px; }
 }
 
+
+
 .nav-item {
   box-sizing: border-box;
   width: 100%;
@@ -1020,4 +955,231 @@ body {
   gap: 10px;
   overflow: hidden;      /* clips label text if it ever peeks out during collapse transition */
   white-space: nowrap;
+} 
+
+
+
+
+
+
+
+
+
+
+
+
+
+:root {
+  --jd-bw-bg:        #ffffff;
+  --jd-bw-surface:   #ffffff;
+  --jd-bw-border:    #d4d4d4;
+  --jd-bw-text:      #111111;
+  --jd-bw-muted:     #6b6b6b;
+  --jd-bw-accent:    #000000;
+  --jd-bw-accent-fg: #ffffff;
+  --jd-bw-danger:    #111111; /* delete actions use the same ink, not red, to stay strictly B&W */
+}
+
+.jd-page {
+  background: var(--jd-bw-bg) !important;
+  color: var(--jd-bw-text) !important;
+  min-height: 100vh;
+}
+
+/* Header */
+.jd-app-header {
+  background: var(--jd-bw-surface) !important;
+  border-bottom: 1px solid var(--jd-bw-border) !important;
+  color: var(--jd-bw-text) !important;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 24px 32px;
+}
+.jd-eyebrow {
+  color: var(--jd-bw-muted) !important;
+  letter-spacing: 0.08em;
+  font-size: 11px;
+  font-weight: 700;
+  margin: 0 0 4px;
+}
+.jd-app-header h1 {
+  margin: 0 0 6px;
+  font-size: 24px;
+  letter-spacing: 0.02em;
+}
+.jd-header-subtitle {
+  color: var(--jd-bw-muted) !important;
+  margin: 0;
+  font-size: 13px;
+}
+.jd-header-actions {
+  display: flex;
+  gap: 8px;
+}
+.jd-header-actions button {
+  background: #ffffff !important;
+  border: 1px solid var(--jd-bw-border) !important;
+  color: var(--jd-bw-text) !important;
+  width: 36px; height: 36px;
+  border-radius: 9px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+}
+.jd-header-actions .jd-profile-button {
+  background: var(--jd-bw-accent) !important;
+  color: var(--jd-bw-accent-fg) !important;
+  border-color: var(--jd-bw-accent) !important;
+}
+
+/* Error banner */
+.jd-error-banner {
+  margin: 16px 32px 0;
+  padding: 12px 16px;
+  border: 1px solid var(--jd-bw-border);
+  border-left: 3px solid #000000;
+  background: #f5f5f5;
+  color: var(--jd-bw-text);
+  font-size: 13px;
+}
+
+/* Stat cards */
+.jd-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  padding: 20px 32px 0;
+}
+.jd-stat-grid [class*="stat-card"],
+.jd-stat-grid > div > div {
+  background: var(--jd-bw-surface) !important;
+  border: 1px solid var(--jd-bw-border) !important;
+  color: var(--jd-bw-text) !important;
+  border-top: 3px solid var(--jd-bw-accent) !important;
+}
+.jd-stat-grid [class*="icon"] {
+  background: #f2f2f2 !important;
+  color: var(--jd-bw-text) !important;
+  border-color: var(--jd-bw-border) !important;
+}
+
+/* Cases section */
+.jd-cases-section {
+  margin: 20px 32px 40px;
+  background: var(--jd-bw-surface) !important;
+  border: 1px solid var(--jd-bw-border) !important;
+  color: var(--jd-bw-text) !important;
+  border-radius: 14px;
+  padding: 20px;
+}
+.jd-section-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 16px;
+}
+.jd-section-heading h2 {
+  margin: 0 0 4px;
+  font-size: 18px;
+}
+.jd-section-heading p {
+  color: var(--jd-bw-muted) !important;
+  margin: 0;
+  font-size: 13px;
+}
+
+/* Primary / secondary buttons */
+.jd-primary-button {
+  background: var(--jd-bw-accent) !important;
+  color: var(--jd-bw-accent-fg) !important;
+  border: 1px solid var(--jd-bw-accent) !important;
+  box-shadow: none !important;
+  padding: 9px 16px;
+  border-radius: 9px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+}
+.jd-primary-button:hover { background: #222222 !important; }
+
+.jd-secondary-button {
+  background: #ffffff !important;
+  color: var(--jd-bw-text) !important;
+  border: 1px solid var(--jd-bw-border) !important;
+  padding: 9px 16px;
+  border-radius: 9px;
+  font-weight: 500;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+/* Sign-in gate */
+.jd-signin-gate {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+}
+.jd-signin-card {
+  text-align: center;
+  max-width: 380px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+.jd-signin-card h2 { margin: 8px 0 0; font-size: 20px; }
+.jd-signin-card p  { color: var(--jd-bw-muted); font-size: 13px; line-height: 1.6; margin: 0 0 8px; }
+.jd-signin-actions { display: flex; gap: 10px; }
+
+/* Tabs — best-effort selectors, adjust class name if CategoryTabs uses different ones */
+[class*="tab"] {
+  color: var(--jd-bw-text) !important;
+}
+[class*="tab"][class*="active"],
+[aria-selected="true"] {
+  background: var(--jd-bw-accent) !important;
+  color: var(--jd-bw-accent-fg) !important;
+  border-color: var(--jd-bw-accent) !important;
+}
+
+/* Search / filter toolbar */
+.jd-cases-section input,
+.jd-cases-section select,
+.jd-cases-section button {
+  border-color: var(--jd-bw-border) !important;
+}
+.jd-cases-section input:focus,
+.jd-cases-section select:focus {
+  outline-color: var(--jd-bw-accent) !important;
+  border-color: var(--jd-bw-accent) !important;
+}
+
+/* Table */
+.jd-cases-section table,
+.jd-cases-section thead,
+.jd-cases-section tbody,
+.jd-cases-section tr,
+.jd-cases-section th,
+.jd-cases-section td {
+  background: var(--jd-bw-surface) !important;
+  color: var(--jd-bw-text) !important;
+  border-color: var(--jd-bw-border) !important;
+}
+.jd-cases-section thead th {
+  color: var(--jd-bw-muted) !important;
+}
+
+/* Pagination */
+[class*="pagination"] button {
+  background: #ffffff !important;
+  color: var(--jd-bw-text) !important;
+  border: 1px solid var(--jd-bw-border) !important;
+}
+[class*="pagination"] button[class*="active"] {
+  background: var(--jd-bw-accent) !important;
+  color: var(--jd-bw-accent-fg) !important;
 }
